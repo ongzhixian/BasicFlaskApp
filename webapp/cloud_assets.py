@@ -6,11 +6,11 @@ from werkzeug.exceptions import abort
 from webapp.auth import login_required
 from webapp.db import get_db
 
-bp = Blueprint('tools', __name__, url_prefix='/tools')
+bp = Blueprint('cloud-assets', __name__, url_prefix='/cloud-assets')
 
 @bp.route('/')
 def index():
-    return render_template('tools/index.html')
+    return render_template('cloud-assets/index.html')
 
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required

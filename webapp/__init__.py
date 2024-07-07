@@ -38,5 +38,17 @@ def create_app(test_config=None):
     
     from . import news
     app.register_blueprint(news.bp)
+    
+    from . import algotrade
+    app.register_blueprint(algotrade.bp)
+    
+    from . import notes
+    app.register_blueprint(notes.bp)
+    
+    from . import cloud_assets
+    app.register_blueprint(cloud_assets.bp)
+    
+    from . import tools
+    app.register_blueprint(tools.bp)
 
     return app
