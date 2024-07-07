@@ -1,15 +1,60 @@
-{% extends 'base.html' %}
+{% extends 'login_layout.html' %}
 
 {% block header %}
   <h1>{% block title %}Log In{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
-  <form method="post">
-    <label for="username">Username</label>
-    <input name="username" id="username" required>
-    <label for="password">Password</label>
-    <input type="password" name="password" id="password" required>
-    <input type="submit" value="Log In">
-  </form>
+
+<div class="container" style="margin-top:1em;">
+
+    <div class="row form">
+      <form class="col s6" method="post">
+
+        <div class="row">
+          <div class="input-field col s6">
+            <input placeholder="Username" name="username" id="username" type="text" />
+            <label for="username">Username</label>
+            <span class="helper-text" data-error="wrong" data-success="right">Your username (email)</span>
+          </div>
+
+          <div class="input-field col s6">
+            <input class="validate" type="password" name="password" id="password" required />
+            <label for="password">Password</label>
+            <span class="helper-text" data-error="Invalid password" data-success="Valid password">Password for your account</span>
+          </div>
+        </div>
+
+        <div class="row">
+            <div class="col s6">
+                <button class="btn waves-effect waves-light" type="submit" name="action" value="Log In">Log in
+                  <i class="material-icons right">send</i>
+                </button>
+            </div>
+        </div>
+
+      </form>
+
+      <div class="col s6">
+
+        {% for message in get_flashed_messages() %}
+          <div class="flash">{{ message }}</div>
+        {% endfor %}
+
+      </div>
+    </div>
+
+    <div class="row attn">
+        <div class="col s12">
+            
+            <pre>
+            Warning: This system is restricted to authorized users of WebApp for business purposes only. 
+            Unauthorized access or use is a violation of application usage policy and the law. 
+            This system may be monitored for administrative and security reasons. 
+            By proceeding, you acknowledge that (1) you have read and understand this notice and (2) you consent to the system monitoring.
+            </pre>
+        </div>
+    </div>
+
+</div>
 {% endblock %}
