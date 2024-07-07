@@ -3,7 +3,13 @@
     <div class="nav-wrapper container"><a id="logo-container" href="/" class="brand-logo">WebApp</a>
       
       <ul class="right hide-on-med-and-down">
-        <li><a href="#">Navbar Link2</a></li>
+        <li><a href="/news">News</a></li>
+        <li><a href="#">AlgoTrade</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Notes</a></li>
+        <li><a href="#">Cloud-Assets</a></li>
+        <li><a href="#">Tools</a></li>
+        
         {% if g.user %}
           <li><span>{{ g.user['username'] }}</span>
           <li><a href="{{ url_for('auth.logout') }}">Log Out</a>
@@ -14,7 +20,12 @@
       </ul>
 
       <ul id="nav-mobile" class="sidenav">
-        <li><a href="#">Navbar Link2</a></li>
+        <li><a href="/news">News</a></li>
+        <li><a href="#">AlgoTrade</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Cloud-Assets</a></li>
+        <li><a href="#">Tools</a></li>
+        
         {% if g.user %}
           <li><span>{{ g.user['username'] }}</span>
           <li><a href="{{ url_for('auth.logout') }}">Log Out</a>

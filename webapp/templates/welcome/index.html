@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <h1>{% block title %}Posts{% endblock %}</h1>
+  <h1>{% block title %}Home{% endblock %}</h1>
   {% if g.user %}
     <a class="action" href="{{ url_for('blog.create') }}">New</a>
   {% endif %}
@@ -11,7 +11,7 @@
 <div class="section no-pad-bot" id="index-banner">
   <div class="container">
     <br><br>
-    <h1 class="header center orange-text">Starter Template</h1>
+    <h1 class="header center">Starter Template</h1>
     <div class="row center">
       <h5 class="header col s12 light">A modern responsive front-end framework based on Material Design</h5>
     </div>
@@ -24,6 +24,18 @@
 </div>
 
 <div class="container">
+  <div class="section">
+    <div class="row">
+      <div class="col s12 m4">
+        <canvas id="myChart"></canvas>
+      </div>
+    </div>
+    
+  </div>
+</div>
+
+<div class="container">
+  
   <div class="section">
 
     <!--   Icon Section   -->
@@ -61,4 +73,32 @@
 </div>
 
 
+{% endblock %}
+
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+'use strict'
+const ctx = document.getElementById('myChart');
+
+new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+    datasets: [{
+      label: '# of Votes',
+      data: [12, 19, 3, 5, 2, 3],
+      borderWidth: 1
+    }]
+  },
+  options: {
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    }
+  }
+});
+</script>
 {% endblock %}

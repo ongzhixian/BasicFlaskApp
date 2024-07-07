@@ -6,7 +6,7 @@ from werkzeug.exceptions import abort
 from webapp.auth import login_required
 from webapp.db import get_db
 
-bp = Blueprint('blog', __name__, url_prefix='/blog')
+bp = Blueprint('notes', __name__, url_prefix='/notes')
 
 # @bp.route('/')
 # def index():
