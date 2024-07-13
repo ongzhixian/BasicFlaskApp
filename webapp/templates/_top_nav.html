@@ -3,14 +3,15 @@
     <div class="nav-wrapper container"><a id="logo-container" href="/" class="brand-logo">WebApp</a>
       
       <ul class="right hide-on-med-and-down">
-        <li><a href="/news">News</a></li>
-        <li><a href="/algotrade">AlgoTrade</a></li>
-        <li><a href="/blog">Blog</a></li>
-        <li><a href="/notes">Notes</a></li>
-        <li><a href="/cloud-assets">Cloud-Assets</a></li>
-        <li><a href="/tools">Tools</a></li>
+        
         
         {% if g.user %}
+          <li><a href="/news">News</a></li>
+          <li><a href="/algotrade">AlgoTrade</a></li>
+          <li><a href="/blog">Blog</a></li>
+          <li><a href="/notes">Notes</a></li>
+          <li><a href="/cloud-assets">Cloud-Assets</a></li>
+          <li><a href="/tools">Tools</a></li>
           <li><span>{{ g.user['username'] }}</span>
           <li><a href="{{ url_for('auth.logout') }}">Log Out</a>
         {% else %}
@@ -20,14 +21,13 @@
       </ul>
 
       <ul id="nav-mobile" class="sidenav">
-        <li><a href="/news">News</a></li>
-        <li><a href="/algotrade">AlgoTrade</a></li>
-        <li><a href="/blog">Blog</a></li>
-        <li><a href="/notes">Notes</a></li>
-        <li><a href="/cloud-assets">Cloud-Assets</a></li>
-        <li><a href="/tools">Tools</a></li>
-        
         {% if g.user %}
+          <li><a href="/news">News</a></li>
+          <li><a href="/algotrade">AlgoTrade</a></li>
+          <li><a href="/blog">Blog</a></li>
+          <li><a href="/notes">Notes</a></li>
+          <li><a href="/cloud-assets">Cloud-Assets</a></li>
+          <li><a href="/tools">Tools</a></li>
           <li><span>{{ g.user['username'] }}</span>
           <li><a href="{{ url_for('auth.logout') }}">Log Out</a>
         {% else %}

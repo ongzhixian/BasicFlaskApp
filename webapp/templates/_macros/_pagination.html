@@ -1,0 +1,37 @@
+{% macro pager(current_page_number, record_count, endpoint='.', page_size=6) %}
+{% set page_count = (record_count / page_size) | int + 1 %}
+<ul class="pagination">
+    
+    {#  ##############################
+        PREVIOUS CHEVRON 
+    #}
+    
+    {% if current_page_number == 1 %}
+    <li class="disabled"><a><i class="material-icons">chevron_left</i></a></li>
+    {% else %}
+    <li ><a href="{{ url_for(endpoint, page_number=page_number-1) }}"><i class="material-icons">chevron_left</i></a></li>
+    {% endif %}
+
+    {#  ##############################
+        PAGE LINKS
+    #}
+    {% for page_number in range(1, page_count + 1) %}
+    {% if current_page_number == page_number %}
+    <li class="active green"><a href="{{ url_for(endpoint, page_number=page_number) }}">{{ page_number }}</a></li>
+    {% else %}
+    <li><a href="{{ url_for(endpoint, page_number=page_number) }}">{{ page_number }}</a></li>
+    {% endif %}
+    {% endfor %}
+    
+    {#  ##############################
+        NEXT CHEVRON
+    #}
+    
+    {% if current_page_number == page_count %}
+    <li class="disabled"><a><i class="material-icons">chevron_right</i></a></li>
+    {% else %}
+    <li class="waves-effect"><a href="{{ url_for(endpoint, page_number=page_number+1) }}"><i class="material-icons">chevron_right</i></a></li>
+    {% endif %}
+    
+</ul>
+{% endmacro %}
