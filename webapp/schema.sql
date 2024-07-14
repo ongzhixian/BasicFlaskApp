@@ -27,3 +27,18 @@ CREATE TABLE IF NOT EXISTS tool (
     url TEXT NULL,
     FOREIGN KEY (user_id) REFERENCES user (id)
 );
+
+
+CREATE TABLE IF NOT EXISTS role (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT UNIQUE NOT NULL,
+    description TEXT NULL
+);
+
+CREATE TABLE IF NOT EXISTS user_role (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    role_id INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES user (id)
+    FOREIGN KEY (role_id) REFERENCES role (id)
+);

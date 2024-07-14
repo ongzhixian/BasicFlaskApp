@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Register{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top:1em;">
+     
+    <form class="col s12" method="post">
+        <div class="row">
+            <div class="input-field col s6">
+                <input placeholder="Tool name" id="tool_name" type="text" class="validate" name="tool_name" />
+                <label for="tool_name">Tool name</label>
+            </div>
+            <!-- 
+            
+            <div class="col s6"></div>
+            -->
+        </div>
+        
+        <div class="row">
+            <div class="input-field col s6">
+                <textarea id="tool_description" name="tool_description" class="materialize-textarea"></textarea>
+                <label for="tool_description">Tool description</label>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="input-field col s6">
+                <input placeholder="Tool url" type="text" class="validate" name="tool_url" id="tool_url" />
+                <label for="tool_url">Tool URL</label>
+            </div>
+            <!-- 
+            
+            <div class="col s6"></div>
+            -->
+        </div>
+
+        <div class="row">
+            <div class="col s6">
+                <button class="btn waves-effect waves-light" type="submit" name="action" value="Register">Register
+                  <i class="material-icons right">send</i>
+                </button>
+            </div>
+        </div>
+
+    </form>
+
+
+    <div class="row">
+        <div class="col s6">
+        {% for message in get_flashed_messages() %}
+          <div class="flash">{{ message }}</div>
+        {% endfor %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

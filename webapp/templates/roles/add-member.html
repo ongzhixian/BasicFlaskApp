@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+
+{% block title %}Add member{% endblock %}
+{% block head %}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet" />
+    <style>
+        h1.page-title {
+            font-family: "Bebas Neue", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+        table.content th {
+            font-family: "Source Sans 3", sans-serif;
+            font-weight: 700;
+            font-style: normal;
+        }
+        table.content td {
+            font-family: "Source Sans 3", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-style: normal;
+            font-size: medium;
+        }
+        ul.collection.usernames {
+            height: 25em;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #4CAF50 #cfd7c7;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top:1em;">
+    
+    <div class="row">
+        <div class="col s12">
+            <h1 class="page-title blue-grey-text">Add member to {{ role['name'] }} role</h1>
+            
+            <p>Search for usernames and add them to list to add.
+                <br/>After you selected all the users, click on the save button.
+            </p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col s6">
+            <div class="row">
+                <div class="input-field col s8">
+                    <input placeholder="Username" id="username" type="text" class="validate" name="username" />
+                    <label for="username">Username</label>
+                </div>
+                <div class="input-field col s4">
+                    <button class="btn-flat waves-effect waves-light green white-text" type="submit" name="action" value="Find">Find
+                      <i class="material-icons right">search</i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col s6">
+            
+            <p style="font-weight:700;">Username search result(s)</p>
+
+            <ul id="searchUsernameResults" class="collection usernames"></ul>
+            
+            <!-- 
+                <li class="collection-item"> 
+                    <button class="waves-effect waves-light btn-flat green white-text" data-user-id="12"><i class="material-icons right">add</i>Alvin</button>
+                </li>
+                <li class="collection-item">Alvin</li>
+                <li class="collection-item">Alvin</li>
+                <li class="collection-item">Alvin</li>
+            -->
+                        
+        </div>
+        <div class="col s6">
+            
+            <p style="font-weight:700;">List of users to add to role</p>
+            
+            <ul id="selectedUsernameList" class="collection usernames"></ul>
+            
+            <!-- ACTION ROW -->
+            <form method="post" id="saveChangesForm">
+                <input type="hidden" id="userIdList" name="user_id_list" />
+                <input type="hidden" name="role_id" value="{{ role['id'] }}" />
+                <div class="row">
+                    <div class="col s6">
+                        <button class="btn-flat waves-effect waves-light green white-text" type="submit" name="action" value="Register">Register
+                          <i class="material-icons right">save</i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            
+        </div>
+    </div>
+
+    
+
+    <div class="row">
+        <div class="col s6">
+        {% for message in get_flashed_messages() %}
+          <div class="flash">{{ message }}</div>
+        {% endfor %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+    'use strict';
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        var usernameInput = document.getElementById('username');
+        usernameInput.addEventListener("input", debounce(queryUsername));
+        
+        let saveChangesForm = document.getElementById('saveChangesForm');
+        saveChangesForm.addEventListener('submit', (event) => {
+            // let selectedUsernameList = document.getElementById('selectedUsernameList');
+            //document.querySelectorAll("#selectedUsernameList button")
+            var userIds = [...document.querySelectorAll("#selectedUsernameList button")].map(function(ele, idx, arr) {
+                return parseInt(ele.dataset['userId'], 10);
+            });
+            let userIdList = document.getElementById('userIdList');
+            userIdList.value = JSON.stringify(userIds);
+        });
+        
+    });
+    
+    async function queryUsername(inputEvent){
+        const url = `/users/api/search?query=${inputEvent.target.value.trim()}`;
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`Response status: ${response.status}`);
+            }
+            const json = await response.json();
+            
+            updateSearchUsernameResults(json);
+        } catch (error) {
+            console.error(error.message);
+        }
+    }
+    
+    function updateSearchUsernameResults(resultList) {
+        console.debug(resultList);
+        var searchUsernameResults = document.getElementById('searchUsernameResults');
+        searchUsernameResults.replaceChildren(); // clear
+        // Add
+        for (let result of resultList) {
+            // TODO: Check if result is already in selected list
+            searchUsernameResults.appendChild(makeListItemElement(result['id'], result['username']));
+        }
+
+        document.querySelectorAll("#searchUsernameResults button").forEach((ele) => {
+            ele.addEventListener('click', (event) => {
+                console.log("TODO: move to selected list", event);
+                let listItem = event.target.closest('li');
+                let resultsList = document.getElementById('searchUsernameResults');
+                let selectedList = document.getElementById('selectedUsernameList');
+                selectedList.appendChild(listItem);
+            });
+        });
+        
+    }
+    
+    // UI FUNCTIONS
+    
+    function makeListItemElement(userId, username) {
+        // <li class="collection-item">Alvin</li>
+        // <button class="waves-effect waves-light btn-flat green white-text" data-user-id="12">
+        //   <i class="material-icons right">add</i>Alvin</button>
+        // </li>
+        const listElement = document.createElement("li");
+        listElement.classList.add("collection-item");
+        listElement.appendChild(makeButtonElement(userId, username));
+        return listElement;
+    }
+    
+    function makeButtonElement(userId, username) {
+        const buttonElement = document.createElement("button");
+        buttonElement.classList.add("waves-effect","waves-light","btn-flat","green","white-text");
+        buttonElement.dataset['userId'] = userId;
+        buttonElement.appendChild(makeIconElement());
+        
+        const textNode = document.createTextNode(username);
+        buttonElement.appendChild(textNode);
+        
+        return buttonElement;
+    }
+    
+    function makeIconElement() {
+        const iconElement = document.createElement("i");
+        iconElement.classList.add("material-icons","right");
+        
+        const iconTextNode = document.createTextNode('add');
+        iconElement.appendChild(iconTextNode);
+        
+        return iconElement;
+    }
+    
+    // HELPER FUNCTIONS
+    
+    function debounce(func, timeout = 1000) {
+        let timer;
+        return (...args) => {
+            clearTimeout(timer);
+            timer = setTimeout(() => { func.apply(this, args); }, timeout);
+        };
+    }
+    
+</script>
+{% endblock %}

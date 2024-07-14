@@ -1,65 +1,85 @@
 from logging import getLogger
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, url_for
+    Blueprint, flash, g, redirect, render_template, request, url_for, jsonify
 )
+from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.exceptions import abort
 
 from webapp.auth import login_required
 from webapp.db import get_db
 
-bp = Blueprint('tools', __name__, url_prefix='/tools')
+bp = Blueprint('users', __name__, url_prefix='/users')
 
 ##############################
 # REPOSITORY
 
-class ToolRepository:
-    """A simple example class"""
-    i = 12345
-    page_size = 6
+class UserRepository:
+    """User repository"""
+    page_size = 10
     log = getLogger(__name__)
 
-    def get_all_tools(self,page_number):
-        offset = (page_number - 1) * 6
-        print(f"get_all_tools {page_number}")
-        self.log.info(f"LOGINFO get_all_tools {page_number}")
+    def get_paged_records(self,page_number):
+        offset = (page_number - 1) * self.page_size
         db = get_db()
-        tools = db.execute("""
-SELECT 	t.id, t.name, t.description, t.url
-FROM 	tool t 
-ORDER BY t.name ASC
+        records = db.execute("""
+SELECT 	u.id, u.username
+FROM 	user u 
+ORDER BY u.username ASC
 LIMIT ? OFFSET ?;
 """, (self.page_size, offset)).fetchall()
-        total_record_count = db.execute("""SELECT COUNT(id) count FROM tool""").fetchone()['count']
-        return (tools, total_record_count)
+        total_record_count = db.execute("""SELECT COUNT(id) count FROM user""").fetchone()['count']
+        return (records, total_record_count)
+        
+        
+    def search(self, query):    
+        db = get_db()
+        records = db.execute("""
+SELECT u.id, u.username 
+FROM user u 
+WHERE username LIKE ?
+ORDER BY u.username ASC
+LIMIT 10;
+""", (query,)).fetchall()
+        return records
+        
         
     def seed(self, item_count=16):
-        tool_description = 'I am a very simple card. I am good at containing small bits of information. I am convenient because I require little markup to use effectively.'
-        user_id = 0
-        tool_url = f'tools.index'
         db = get_db()
         for i in range (1, item_count + 1):
-            tool_name = f"Tool {i:03d}"
+            username = f"testuser{i:03d}"
             db.execute(
-                'INSERT INTO tool (name, description, url, user_id)'
-                ' VALUES (?, ?, ?, ?)',
-                (tool_name, tool_description, tool_url, g.user['id'])
+                "INSERT INTO user (username, password) VALUES (?, ?)",
+                (username, generate_password_hash(username)),
             )
         db.commit()
         
 
+    
+
+
 ##############################
 # ROUTES
 
-tool_repository = ToolRepository()
+user_repository = UserRepository()
+
+@bp.route('/api/search')
+def api_search():
+    query = request.args.get('query')
+    print(f"api search for {query}")
+    records = user_repository.search(f"%{query}%")
+    return jsonify([dict(record) for record in records])
+    
 
 @bp.route('/')
 @bp.route('/<int:page_number>')
 def index(page_number=1):
-    #tool_repository.seed(16)
-    (tools, total_record_count) = tool_repository.get_all_tools(page_number)
-    #print(f"page_number is {page_number}")
-    return render_template('tools/index.html', tools=tools, 
-        total_record_count=total_record_count,page_number=page_number)
+    #user_repository.seed(16)
+    (user_records, total_record_count) = user_repository.get_paged_records(page_number)
+    return render_template('users/index.html', 
+        users=user_records, 
+        total_record_count=total_record_count,
+        page_number=page_number)
+    
 
 @bp.route('/register', methods=('GET', 'POST'))
 @login_required

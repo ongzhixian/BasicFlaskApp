@@ -25,6 +25,9 @@
             font-style: normal;
             font-size: medium;
         }
+        div.card-content {
+            min-height: 180px;
+        }
     </style>
 {% endblock %}
 
@@ -48,7 +51,7 @@
                     <p>{{ tool['description'] }}</p>
                 </div>
                 <div class="card-action">
-                    <a href="{{ tool['url'] }}">Use tool</a>
+                    <a href="{{ url_for(tool['url']) }}">Use tool</a>
                     <a href="{{ url_for('tools.edit', id=tool['id']) }}">Edit</a>
                 </div>
             </div>

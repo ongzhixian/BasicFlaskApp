@@ -50,5 +50,11 @@ def create_app(test_config=None):
     
     from . import tools
     app.register_blueprint(tools.bp)
+    
+    from . import users
+    app.register_blueprint(users.bp)
+    
+    from . import roles
+    app.register_blueprint(roles.bp)
 
     return app
