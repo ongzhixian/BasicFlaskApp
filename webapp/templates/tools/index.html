@@ -26,7 +26,11 @@
             font-size: medium;
         }
         div.card-content {
-            min-height: 180px;
+            min-height: 10.5em;
+            max-height: 10.5em;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #4CAF50 #546e7a;
         }
     </style>
 {% endblock %}
@@ -48,7 +52,7 @@
             <div class="card blue-grey darken-1">
                 <div class="card-content white-text">
                     <span class="card-title">{{ tool['name'] }}</span>
-                    <p>{{ tool['description'] }}</p>
+                    <p>{{ tool['description'].split('\n')|join('<br/>'|safe) }}</p>
                 </div>
                 <div class="card-action">
                     <a href="{{ url_for(tool['url']) }}">Use tool</a>

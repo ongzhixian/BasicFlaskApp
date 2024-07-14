@@ -56,5 +56,9 @@ def create_app(test_config=None):
     
     from . import roles
     app.register_blueprint(roles.bp)
+    
+    from . import file_upload
+    app.register_blueprint(file_upload.bp)
+
 
     return app

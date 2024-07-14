@@ -123,6 +123,7 @@ def edit(id):
         'select t.id, t.name, t.description, t.url from tool t where t.id = ?',
         (id,)
     ).fetchone()
+    print(tool['description'].encode('unicode_escape'))
     return render_template('tools/edit.html', tool=tool)
 
 
