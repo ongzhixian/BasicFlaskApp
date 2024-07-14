@@ -1,3 +1,4 @@
+from logging import getLogger
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for
 )
@@ -8,19 +9,63 @@ from webapp.db import get_db
 
 bp = Blueprint('notes', __name__, url_prefix='/notes')
 
+##############################
+# REPOSITORY
+
+class NoteRepository:
+    """Database repository for user notes"""
+    page_size = 10
+    log = getLogger(__name__)
+
+    def get_user_notes(self, user_id, page_number = 1):
+        offset = (page_number - 1) * self.page_size
+        db = get_db()
+        records = db.execute("""
+SELECT n.id, n.update_ts, n.title, n.content FROM note n WHERE n.user_id = ?
+ORDER BY n.update_ts DESC, n.title ASC
+LIMIT ? OFFSET ?;
+""", (user_id, self.page_size, offset)).fetchall()
+        total_record_count = db.execute("""SELECT COUNT(id) count FROM note n WHERE n.user_id = ?""",(user_id,)).fetchone()['count']
+        return (records, total_record_count)
+        
+    def seed(self, item_count=16):
+        tool_description = 'I am a very simple card. I am good at containing small bits of information. I am convenient because I require little markup to use effectively.'
+        user_id = 0
+        tool_url = f'tools.index'
+        db = get_db()
+        for i in range (1, item_count + 1):
+            tool_name = f"Tool {i:03d}"
+            db.execute(
+                'INSERT INTO tool (name, description, url, user_id)'
+                ' VALUES (?, ?, ?, ?)',
+                (tool_name, tool_description, tool_url, g.user['id'])
+            )
+        db.commit()
+        
+
+
+##############################
+# ROUTES
+
+note_repository = NoteRepository()
+
 @bp.route('/')
-def index():
-    return render_template('notes/index.html')
+@bp.route('/<int:page_number>')
+@login_required
+def index(page_number=1):
+    (notes, total_record_count) = note_repository.get_user_notes(g.user['id'], page_number)
+    return render_template('notes/index.html', notes=notes, 
+        total_record_count=total_record_count,page_number=page_number)
 
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required
 def create():
     if request.method == 'POST':
-        title = request.form['title']
-        body = request.form['body']
+        note_title = request.form['note_title']
+        note_content = request.form['note_content']
         error = None
 
-        if not title:
+        if not note_title:
             error = 'Title is required.'
 
         if error is not None:
@@ -28,14 +73,14 @@ def create():
         else:
             db = get_db()
             db.execute(
-                'INSERT INTO post (title, body, author_id)'
+                'INSERT INTO note (title, content, user_id)'
                 ' VALUES (?, ?, ?)',
-                (title, body, g.user['id'])
+                (note_title, note_content, g.user['id'])
             )
             db.commit()
-            return redirect(url_for('blog.index'))
+            return redirect(url_for('notes.index'))
 
-    return render_template('blog/create.html')
+    return render_template('notes/create.html')
 
 def get_post(id, check_author=True):
     post = get_db().execute(

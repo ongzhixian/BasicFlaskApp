@@ -54,8 +54,9 @@ tool_repository = ToolRepository()
 
 @bp.route('/')
 @bp.route('/<int:page_number>')
+@login_required
 def index(page_number=1):
-    #tool_repository.seed(16)
+    #tool_repository.seed(10)
     (tools, total_record_count) = tool_repository.get_all_tools(page_number)
     #print(f"page_number is {page_number}")
     return render_template('tools/index.html', tools=tools, 

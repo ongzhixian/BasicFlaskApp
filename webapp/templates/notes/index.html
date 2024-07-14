@@ -13,19 +13,17 @@
           font-weight: 700;
           font-style: normal;
         }
-        article h1.title {
-          font-family: "Playfair Display", serif;
-          font-optical-sizing: auto;
-          font-weight: 700;
-          font-style: normal;
-          font-size: 2em;
-          margin:0;
+
+        .note .title {
+            font-family: "Playfair Display", serif;
+            font-size: 1.26em !important;
+            font-weight: 500;
         }
-        article section.body {
-            font-family: "Source Sans 3", sans-serif;
-            font-optical-sizing: auto;
-            font-weight: 400;
-            font-style: normal;
+        .note p {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+
         }
     </style>
 {% endblock %}
@@ -41,6 +39,50 @@
     </div>
     
     <div class="row">
+        
+        <ul class="collection">
+            
+        {% for note in notes %}
+            <li class="collection-item avatar note">
+                <i class="material-icons circle green">note</i>
+                <a href="#" class="title black-text">{{ note['title'] }}</a>
+                <p>{{ note['content'].split('\n')|join('<br/>'|safe) }}</p>
+                <a href="#!" class="secondary-content"><i class="material-icons">grade</i></a>
+            </li>
+        {% endfor %}
+            
+            <!--
+            <li class="collection-item avatar">
+                <i class="material-icons circle">draft</i>
+                <span class="title">Title</span>
+                <p>First Line <br>
+                 Second Line
+                </p>
+                <a href="#!" class="secondary-content"><i class="material-icons">grade</i></a>
+            </li>
+            
+            <li class="collection-item avatar">
+                <i class="material-icons circle green">insert_chart</i>
+                <span class="title">Title</span>
+                <p>First Line <br>
+                 Second Line
+                </p>
+                <a href="#!" class="secondary-content"><i class="material-icons">grade</i></a>
+            </li>
+            
+            <li class="collection-item avatar">
+                <i class="material-icons circle red">play_arrow</i>
+                <span class="title">Title</span>
+                <p>First Line <br>
+                 Second Line
+                </p>
+                <a href="#!" class="secondary-content"><i class="material-icons">grade</i></a>
+            </li>
+            -->
+            
+        </ul>
+        
+        <!--
         <div class="col s4">
             <article>
                 <h1 class="title">Article 1</h1>
@@ -85,12 +127,13 @@
                 </section>
             </article>
         </div>
+        -->
 
         
     </div>
     
     <div class="row">
-        <div class="col s12">
+        <div class="col s6">
             <ul class="pagination">
                 <li class="disabled"><a href="#!"><i class="material-icons">chevron_left</i></a></li>
                 <li class="active green"><a href="#!">1</a></li>
@@ -101,8 +144,12 @@
                 <li class="waves-effect"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
             </ul>
         </div>
+        
+        <div class="col s6 right-align">
+            <a href="{{ url_for('notes.create') }}" class="waves-effect waves-light green btn">
+                <i class="material-icons right">add</i>Add new note</a>
+        </div>
     </div>
-    
     
 </div>
 
