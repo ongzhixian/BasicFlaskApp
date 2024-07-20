@@ -1,3 +1,5 @@
+from logging import getLogger
+
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for
 )
@@ -6,84 +8,128 @@ from werkzeug.exceptions import abort
 from webapp.auth import login_required
 from webapp.db import get_db
 
+import markdown
+
 bp = Blueprint('blog', __name__, url_prefix='/blog')
 
+##############################
+# REPOSITORY
+
+class BlogRepository:
+    """Database repository for blog posts"""
+    page_size = 5
+    log = getLogger(__name__)
+
+    def get_user_blog_posts(self, user_id, page_number = 1):
+        offset = (page_number - 1) * self.page_size
+        db = get_db()
+        records = db.execute("""
+SELECT p.id, p.update_ts, p.content, p.user_id, u.username FROM blog_post p 
+JOIN user u on p.user_id = u.id
+WHERE p.user_id = ?
+ORDER BY p.update_ts DESC
+LIMIT ? OFFSET ?;
+""", (user_id, self.page_size, offset)).fetchall()
+        total_record_count = db.execute("""SELECT COUNT(id) count FROM blog_post p WHERE p.user_id = ?""",(user_id,)).fetchone()['count']
+        return (records, total_record_count)
+
+        
+    def get_user_blog_post(self, user_id, id):
+        db = get_db()
+        record = db.execute("""
+SELECT p.id, p.update_ts, p.content, p.user_id FROM blog_post p WHERE p.user_id = ? AND p.id = ?;
+""", (user_id, id)).fetchone()
+        return record
+
+
+    def add_user_blog_post(self, blog_content, user_id):
+        db = get_db()
+        db.execute(
+            'INSERT INTO blog_post (content, user_id)'
+            ' VALUES (?, ?)',
+            (blog_content, user_id)
+        )
+        db.commit()
+        
+        
+    def update_user_blog_post(self, blog_content, user_id, id):
+        db = get_db()
+        db.execute(
+            'UPDATE blog_post SET content = ?, update_ts=DATETIME() WHERE user_id = ? AND id = ?',
+            (blog_content, user_id, id)
+        )
+        db.commit()
+        
+        
+    def delete_user_blog_post(self, user_id, id):
+        db = get_db()
+        record = db.execute("""DELETE blog_post WHERE user_id = ? AND id = ?';""", (user_id, id)).fetchone()
+        return record        
+
+
+
+##############################
+# ROUTES
+
+blog_repository = BlogRepository()
+
+
 @bp.route('/')
-def index():
-    db = get_db()
-    posts = db.execute(
-        'SELECT p.id, title, body, created, author_id, username'
-        ' FROM post p JOIN user u ON p.author_id = u.id'
-        ' ORDER BY created DESC'
-    ).fetchall()
-    return render_template('blog/index.html', posts=posts)
+@bp.route('/<int:page_number>')
+@login_required
+def index(page_number=1):
+    (posts, total_record_count) = blog_repository.get_user_blog_posts(g.user['id'], page_number)
+    # htmlContent = markdown.markdown(note['content'])
+    # p.id, p.update_ts, p.content, p.user_id, u.username
+    post_list = []
+    for post in posts:
+        post_list.append({
+            'id' : post['id'],
+            'update_ts' : post['update_ts'],
+            'content' : markdown.markdown(post['content']),
+            'user_id' : post['user_id'],
+            'username' : post['username'],
+        })
+    return render_template('blog/index.html', posts=post_list, 
+        total_record_count=total_record_count, page_number=page_number)
 
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required
 def create():
     if request.method == 'POST':
-        title = request.form['title']
-        body = request.form['body']
+        blog_content = request.form['blog_content']
         error = None
 
-        if not title:
-            error = 'Title is required.'
+        if not blog_content:
+            error = 'Blog content is required.'
 
         if error is not None:
             flash(error)
         else:
-            db = get_db()
-            db.execute(
-                'INSERT INTO post (title, body, author_id)'
-                ' VALUES (?, ?, ?)',
-                (title, body, g.user['id'])
-            )
-            db.commit()
+            blog_repository.add_user_blog_post(blog_content, g.user['id'])
             return redirect(url_for('blog.index'))
 
     return render_template('blog/create.html')
 
-def get_post(id, check_author=True):
-    post = get_db().execute(
-        'SELECT p.id, title, body, created, author_id, username'
-        ' FROM post p JOIN user u ON p.author_id = u.id'
-        ' WHERE p.id = ?',
-        (id,)
-    ).fetchone()
 
-    if post is None:
-        abort(404, f"Post id {id} doesn't exist.")
-
-    if check_author and post['author_id'] != g.user['id']:
-        abort(403)
-
-    return post
-
-@bp.route('/<int:id>/update', methods=('GET', 'POST'))
+@bp.route('/edit/<int:id>', methods=('GET', 'POST'))
 @login_required
-def update(id):
-    post = get_post(id)
-
+def edit(id):
     if request.method == 'POST':
-        title = request.form['title']
-        body = request.form['body']
+        blog_content = request.form['blog_content']
         error = None
 
-        if not title:
-            error = 'Title is required.'
+        if not blog_content:
+            error = 'Blog content is required.'
 
         if error is not None:
             flash(error)
         else:
-            db = get_db()
-            db.execute(
-                'UPDATE post SET title = ?, body = ?'
-                ' WHERE id = ?',
-                (title, body, id)
-            )
-            db.commit()
+            blog_repository.update_user_blog_post(blog_content, g.user['id'], id)
             return redirect(url_for('blog.index'))
 
+    
+    post = blog_repository.get_user_blog_post(g.user['id'], id)
     return render_template('blog/update.html', post=post)
 
 @bp.route('/<int:id>/delete', methods=('POST',))

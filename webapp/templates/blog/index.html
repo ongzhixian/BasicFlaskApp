@@ -1,28 +1,93 @@
 {% extends 'base.html' %}
+{% from "_macros/_pagination.html" import pager with context %}
 
-{% block header %}
-  <h1>{% block title %}Posts{% endblock %}</h1>
-  {% if g.user %}
-    <a class="action" href="{{ url_for('blog.create') }}">New</a>
-  {% endif %}
+{% block title %}Posts{% endblock %}
+
+{% block head %}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet" />
+    <style>
+        h1.page-title {
+          font-family: "Playfair Display", serif;
+          font-optical-sizing: auto;
+          font-weight: 700;
+          font-style: normal;
+        }
+        article.post {
+            font-family: "Playfair Display", serif;
+        }
+        article.post h1,h2,h3,h4,h5,h6 {
+            margin: 0 0 .36em;
+            font-weight: bold
+        }
+        
+        article.post h1 { font-size: 2.6em; }
+        article.post h2 { font-size: 2.26em; }
+        article.post h3 { font-size: 1.92em; }
+        article.post h4 { font-size: 1.58em; }
+        article.post h5 { font-size: 1.24em; }
+        article.post h6 { font-size: 0.9em; }
+        
+        article h1.title {
+          font-family: "Playfair Display", serif;
+          font-optical-sizing: auto;
+          font-weight: 700;
+          font-style: normal;
+          font-size: 2em;
+          margin:0;
+        }
+        article section.body {
+            font-family: "Source Sans 3", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-style: normal;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
-  {% for post in posts %}
-    <article class="post">
-      <header>
-        <div>
-          <h1>{{ post['title'] }}</h1>
-          <div class="about">by {{ post['username'] }} on {{ post['created'].strftime('%Y-%m-%d') }}</div>
-        </div>
-        {% if g.user['id'] == post['author_id'] %}
-          <a class="action" href="{{ url_for('blog.update', id=post['id']) }}">Edit</a>
-        {% endif %}
-      </header>
-      <p class="body">{{ post['body'] }}</p>
-    </article>
-    {% if not loop.last %}
-      <hr>
+
+<div class="container">
+    
+    <div class="row">
+        <h1 class="page-title">My blog posts</h1>    
+    </div>
+    
+    {% if posts | length <= 0 %}
+    <p>You have no blog posts.</p>
     {% endif %}
-  {% endfor %}
+        
+    {% for post in posts %}
+    <div class="row">
+        <article class="post">
+            <p class="body">{{ post['content'] | safe }}</p>
+            <footer>
+                <div>
+                    <div class="about">Written by {{ post['username'] }} on {{ post['update_ts'].strftime('%Y-%m-%d') }}
+                    {% if g.user['id'] == post['user_id'] %}
+                        <a class="action" href="{{ url_for('blog.edit', id=post['id']) }}">
+                            <i class="material-icons">edit</i></a>
+                    {% endif %}
+                    </div>
+                </div>
+                
+            </footer>
+        </article>
+        {% if not loop.last %}<hr>{% endif %}
+    </div>
+    {% endfor %}
+    
+    <div class="row">
+        <div class="col s6">
+            {{ pager(page_number, total_record_count, 'blog.index', 5) }}
+        </div>
+        <div class="col s6 right-align">
+            <a href="{{ url_for('blog.create') }}" class="waves-effect waves-light green btn">
+                <i class="material-icons right">add</i>Add new blog post</a>
+        </div>
+    </div>
+    
+</div>
+
 {% endblock %}

@@ -1,5 +1,7 @@
 {% macro pager(current_page_number, record_count, endpoint='.', page_size=6, subId=None) %}
-{% set page_count = (record_count / page_size) | int + 1 %}
+
+{% set plus_page = 0 if record_count % page_size == 0 else 1 %}
+{% set page_count = (record_count / page_size) | round(0, 'floor') | int + plus_page  %}
 <ul class="pagination">
     
     {#  ##############################

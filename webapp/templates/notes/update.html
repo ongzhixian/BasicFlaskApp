@@ -1,20 +1,89 @@
 {% extends 'base.html' %}
 
-{% block header %}
-  <h1>{% block title %}Edit "{{ post['title'] }}"{% endblock %}</h1>
+{% block title %}Update note{% endblock %}
+
+{% block head %}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet" />
+    <style>
+        h1.page-title {
+          font-family: "Playfair Display", serif;
+          font-optical-sizing: auto;
+          font-weight: 700;
+          font-style: normal;
+        }
+        
+        #note_title {
+            font-family: "Boogaloo", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+            font-size: 1.67em;
+        }
+        
+        #note_content {
+            min-height: 14em;
+            font-family: "Boogaloo", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+            font-size: 1.67em;
+        }
+        
+        nav.breadcrumbs {
+            background: none;
+            box-shadow: none;
+        }
+        nav.breadcrumbs .breadcrumb {
+            font-family: "Playfair Display", serif;
+            color: rgba(0,0,0,1)
+        }
+        nav.breadcrumbs .breadcrumb:before {
+            color: rgba(0,0,0,0.7)
+        }
+        
+    </style>
 {% endblock %}
 
+
 {% block content %}
-  <form method="post">
-    <label for="title">Title</label>
-    <input name="title" id="title"
-      value="{{ request.form['title'] or post['title'] }}" required>
-    <label for="body">Body</label>
-    <textarea name="body" id="body">{{ request.form['body'] or post['body'] }}</textarea>
-    <input type="submit" value="Save">
-  </form>
-  <hr>
-  <form action="{{ url_for('blog.delete', id=post['id']) }}" method="post">
-    <input class="danger" type="submit" value="Delete" onclick="return confirm('Are you sure?');">
-  </form>
+            
+            
+<div class="container" style="margin-top:1em;">
+    <nav class="breadcrumbs">
+        <div class="col s12">
+            <a class="breadcrumb">Notes</a>
+            <a class="breadcrumb">Edit</a>
+        </div>
+    </nav>
+
+    <form method="post">
+        <input type="hidden" name="id" value="{{ note['id'] }}" />
+        <div class="row">
+            <div class="input-field col s10">
+                <input placeholder="Note title" id="note_title" type="text" class="validate" name="note_title" value="{{ note['title'] }}" />
+                <label for="note_title">Title</label>
+            </div>
+
+        </div>
+        
+        <div class="row">
+            <div class="input-field col s10">
+                <textarea id="note_content" name="note_content" class="materialize-textarea">{{ note['content'] }}</textarea>
+                <label for="note_content">Note content (markdown)</label>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s6">
+                <button class="btn waves-effect waves-light green" type="submit" name="action" value="Save note">Save note
+                  <i class="material-icons right">save</i>
+                </button>
+            </div>
+        </div>
+
+    </form>
+
+
+
+</div>
 {% endblock %}

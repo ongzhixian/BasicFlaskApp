@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Note{% endblock %}
+
+{% block head %}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet" />
+    <style>
+        h1.page-title {
+          font-family: "Playfair Display", serif;
+          font-optical-sizing: auto;
+          font-weight: 700;
+          font-style: normal;
+        }
+
+        article.note {
+            font-family: "Boogaloo", sans-serif;
+            font-size: 1.36em;
+        }
+        
+        article.note h1,h2,h3,h4,h5,h6 {
+            margin: 0;
+        }
+        
+    </style>
+{% endblock %}
+
+{% block content %}
+           
+<div class="container" style="margin-top:1em;">
+    
+    <article class="note">{{ content | safe }}</article>
+
+    <hr />
+    <div class="row">
+        <div class="col s6">
+            <a href="{{ url_for('notes.create') }}" class="waves-effect waves-light green btn">
+                <i class="material-icons right">edit</i>Edit</a>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

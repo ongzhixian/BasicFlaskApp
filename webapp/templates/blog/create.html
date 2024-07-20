@@ -1,15 +1,81 @@
 {% extends 'base.html' %}
 
-{% block header %}
-  <h1>{% block title %}New Post{% endblock %}</h1>
+{% block title %}New blog post{% endblock %}
+
+{% block head %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+    <style>
+        h1.page-title {
+          font-family: "Playfair Display", serif;
+          font-optical-sizing: auto;
+          font-weight: 700;
+          font-style: normal;
+        }
+        
+        #blog_content {
+            min-height: 14em;
+            font-family: "Inconsolata", monospace;
+            font-weight: 400;
+            font-style: normal;
+            font-size: 1.67em;
+        }
+        
+        nav.breadcrumbs {
+            background: none;
+            box-shadow: none;
+        }
+        nav.breadcrumbs .breadcrumb {
+            font-family: "Playfair Display", serif;
+            color: rgba(0,0,0,1)
+        }
+        nav.breadcrumbs .breadcrumb:before {
+            color: rgba(0,0,0,0.7)
+        }
+        
+    </style>
 {% endblock %}
 
 {% block content %}
-  <form method="post">
-    <label for="title">Title</label>
-    <input name="title" id="title" value="{{ request.form['title'] }}" required>
-    <label for="body">Body</label>
-    <textarea name="body" id="body">{{ request.form['body'] }}</textarea>
-    <input type="submit" value="Save">
-  </form>
+            
+<div class="container" style="margin-top:1em;">
+    <nav class="breadcrumbs">
+        <div class="col s12">
+            <a class="breadcrumb" href="{{ url_for('blog.index') }}">Blog</a>
+            <a class="breadcrumb">Add new post</a>
+        </div>
+    </nav>
+
+
+    <form method="post">
+        
+        <div class="row">
+            <div class="input-field col s10">
+                <textarea id="blog_content" name="blog_content" class="materialize-textarea"></textarea>
+                <label for="blog_content">Blog post content (markdown)</label>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s6">
+                <button class="btn waves-effect waves-light green" type="submit" name="action" value="Add post">Add post
+                  <i class="material-icons right">save</i>
+                </button>
+            </div>
+        </div>
+
+    </form>
+
+
+    <div class="row">
+        <div class="col s6">
+        {% for message in get_flashed_messages() %}
+          <div class="flash">{{ message }}</div>
+        {% endfor %}
+        </div>
+    </div>
+
+</div>
+
 {% endblock %}

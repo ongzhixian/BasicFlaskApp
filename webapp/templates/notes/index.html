@@ -23,7 +23,7 @@
             text-overflow: ellipsis;
             overflow: hidden;
             white-space: nowrap;
-
+            max-height: 2.46em;
         }
     </style>
 {% endblock %}
@@ -43,92 +43,30 @@
         <ul class="collection">
             
         {% for note in notes %}
-            <li class="collection-item avatar note">
+            <li class="collection-item note">
+                <!--
                 <i class="material-icons circle green">note</i>
-                <a href="#" class="title black-text">{{ note['title'] }}</a>
+                -->
+                <a href="{{ url_for('notes.view',id=note['id']) }}" class="title">{{ note['title'] }}</a>
+                
+                <!--
+                <div>
+                    <div class="chip">Urgent <i class="close material-icons">close</i></div>
+                    <div class="chip">Task <i class="close material-icons">close</i></div>
+                </div>
+                -->
+                
+                <!--
                 <p>{{ note['content'].split('\n')|join('<br/>'|safe) }}</p>
-                <a href="#!" class="secondary-content"><i class="material-icons">grade</i></a>
+                -->
+                <span class="secondary-content">
+                    <a href="{{ url_for('notes.edit',id=note['id']) }}"><i class="material-icons">edit</i></a>
+                    <a href="#!"><i class="material-icons">grade</i></a>
+                </span>
             </li>
         {% endfor %}
-            
-            <!--
-            <li class="collection-item avatar">
-                <i class="material-icons circle">draft</i>
-                <span class="title">Title</span>
-                <p>First Line <br>
-                 Second Line
-                </p>
-                <a href="#!" class="secondary-content"><i class="material-icons">grade</i></a>
-            </li>
-            
-            <li class="collection-item avatar">
-                <i class="material-icons circle green">insert_chart</i>
-                <span class="title">Title</span>
-                <p>First Line <br>
-                 Second Line
-                </p>
-                <a href="#!" class="secondary-content"><i class="material-icons">grade</i></a>
-            </li>
-            
-            <li class="collection-item avatar">
-                <i class="material-icons circle red">play_arrow</i>
-                <span class="title">Title</span>
-                <p>First Line <br>
-                 Second Line
-                </p>
-                <a href="#!" class="secondary-content"><i class="material-icons">grade</i></a>
-            </li>
-            -->
-            
+        
         </ul>
-        
-        <!--
-        <div class="col s4">
-            <article>
-                <h1 class="title">Article 1</h1>
-                <section class="meta">
-                    Written by zzz on <time datetime="2018-07-07">July 7</time>
-                </section>
-                <section class="body">
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                </section>
-                <section class="action">
-                    <a href="#">Continue reading &hellip;</a>
-                </section>
-            </article>
-        </div>
-        
-        <div class="col s4">
-            <article>
-                <h1 class="title">Article 2</h1>
-                <section class="meta">
-                    Written by zzz on <time datetime="2018-07-07">July 7</time>
-                </section>
-                <section class="body">
-                    <p>Et malesuada fames ac turpis. Mauris a diam maecenas sed. Massa vitae tortor condimentum lacinia quis vel eros donec ac. Facilisis sed odio morbi quis commodo odio aenean sed adipiscing. Quis blandit turpis cursus in hac. Convallis a cras semper auctor neque vitae tempus quam pellentesque. Scelerisque eu ultrices vitae auctor eu augue ut lectus arcu. Et tortor at risus viverra adipiscing at in tellus integer. Nibh nisl condimentum id venenatis. Amet tellus cras adipiscing enim eu turpis egestas pretium. Ac auctor augue mauris augue neque gravida in fermentum. Nascetur ridiculus mus mauris vitae ultricies. Nunc scelerisque viverra mauris in aliquam sem. Eget velit aliquet sagittis id consectetur. Non quam lacus suspendisse faucibus. Imperdiet nulla malesuada pellentesque elit eget gravida cum sociis natoque. Interdum posuere lorem ipsum dolor sit amet. Ultricies mi quis hendrerit dolor. Pellentesque elit ullamcorper dignissim cras. Pharetra diam sit amet nisl suscipit adipiscing bibendum est.</p>
-                </section>
-                <section class="action">
-                    <a href="#">Continue reading &hellip;</a>
-                </section>
-            </article>
-        </div>
-        
-        <div class="col s4">
-            <article>
-                <h1 class="title">Article 3</h1>
-                <section class="meta">
-                    Written by zzz on <time datetime="2018-07-07">July 7</time>
-                </section>
-                <section class="body">
-                    <p>Varius sit amet mattis vulputate enim nulla. Vel eros donec ac odio tempor orci dapibus ultrices. Malesuada bibendum arcu vitae elementum curabitur vitae nunc sed velit. Sagittis id consectetur purus ut faucibus pulvinar elementum integer. Viverra maecenas accumsan lacus vel. Sit amet massa vitae tortor. Augue ut lectus arcu bibendum at varius vel. Vitae ultricies leo integer malesuada nunc vel risus commodo. Eu volutpat odio facilisis mauris sit amet. Feugiat in ante metus dictum at. Eget velit aliquet sagittis id consectetur purus ut. Nibh venenatis cras sed felis eget velit aliquet sagittis. Ornare massa eget egestas purus viverra accumsan in. Porttitor lacus luctus accumsan tortor posuere ac ut. Id diam vel quam elementum pulvinar etiam non. Phasellus egestas tellus rutrum tellus pellentesque. Morbi leo urna molestie at elementum eu facilisis. Donec pretium vulputate sapien nec sagittis aliquam. Ut sem viverra aliquet eget sit amet tellus cras.</p>
-                </section>
-                <section class="action">
-                    <a href="#">Continue reading &hellip;</a>
-                </section>
-            </article>
-        </div>
-        -->
-
         
     </div>
     

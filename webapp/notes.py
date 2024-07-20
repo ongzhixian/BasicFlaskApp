@@ -7,6 +7,8 @@ from werkzeug.exceptions import abort
 from webapp.auth import login_required
 from webapp.db import get_db
 
+import markdown
+
 bp = Blueprint('notes', __name__, url_prefix='/notes')
 
 ##############################
@@ -27,6 +29,13 @@ LIMIT ? OFFSET ?;
 """, (user_id, self.page_size, offset)).fetchall()
         total_record_count = db.execute("""SELECT COUNT(id) count FROM note n WHERE n.user_id = ?""",(user_id,)).fetchone()['count']
         return (records, total_record_count)
+        
+    def get_user_note(self, user_id, id):
+        db = get_db()
+        record = db.execute("""
+SELECT n.id, n.update_ts, n.title, n.content FROM note n WHERE n.user_id = ? AND id = ?;
+""", (user_id, id)).fetchone()
+        return record
         
     def seed(self, item_count=16):
         tool_description = 'I am a very simple card. I am good at containing small bits of information. I am convenient because I require little markup to use effectively.'
@@ -56,6 +65,15 @@ def index(page_number=1):
     (notes, total_record_count) = note_repository.get_user_notes(g.user['id'], page_number)
     return render_template('notes/index.html', notes=notes, 
         total_record_count=total_record_count,page_number=page_number)
+
+
+@bp.route('/view/<int:id>')
+@login_required
+def view(id=1):
+    note = note_repository.get_user_note(g.user['id'], id)
+    
+    htmlContent = markdown.markdown(note['content'])
+    return render_template('notes/view.html', note=note, content=htmlContent)
 
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required
@@ -98,17 +116,16 @@ def get_post(id, check_author=True):
 
     return post
 
-@bp.route('/<int:id>/update', methods=('GET', 'POST'))
+@bp.route('/<int:id>/edit', methods=('GET', 'POST'))
 @login_required
-def update(id):
-    post = get_post(id)
-
+def edit(id):
+    
     if request.method == 'POST':
-        title = request.form['title']
-        body = request.form['body']
+        note_title = request.form['note_title']
+        note_content = request.form['note_content']
         error = None
 
-        if not title:
+        if not note_title:
             error = 'Title is required.'
 
         if error is not None:
@@ -116,14 +133,16 @@ def update(id):
         else:
             db = get_db()
             db.execute(
-                'UPDATE post SET title = ?, body = ?'
-                ' WHERE id = ?',
-                (title, body, id)
+                'UPDATE note SET title = ?, content = ?'
+                ' WHERE id = ? AND user_id = ?',
+                (note_title, note_content, id, g.user['id'])
             )
             db.commit()
-            return redirect(url_for('blog.index'))
+            return redirect(url_for('notes.index'))
 
-    return render_template('blog/update.html', post=post)
+    note = note_repository.get_user_note(g.user['id'], id)
+    return render_template('notes/update.html', note=note)
+
 
 @bp.route('/<int:id>/delete', methods=('POST',))
 @login_required
