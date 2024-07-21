@@ -63,6 +63,37 @@ CREATE TABLE IF NOT EXISTS blog_post (
     create_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     update_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     title TEXT NOT NULL,
-    content TEXT NULL,  
+    content TEXT NULL,
     FOREIGN KEY (user_id) REFERENCES user (id)
+);
+
+CREATE TABLE IF NOT EXISTS issue_type (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL
+);
+INSERT INTO issue_type (title) VALUES ('Bug');
+INSERT INTO issue_type (title) VALUES ('Feature');
+
+
+CREATE TABLE IF NOT EXISTS issue_status (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL
+);
+INSERT INTO issue_status (title) VALUES ('New');
+INSERT INTO issue_status (title) VALUES ('Assigned');
+INSERT INTO issue_status (title) VALUES ('Closed');
+
+
+CREATE TABLE IF NOT EXISTS issue (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    create_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    update_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    type_id INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT NULL,
+    status_id INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES user (id),
+    FOREIGN KEY (type_id) REFERENCES issue_type (id),
+    FOREIGN KEY (status_id) REFERENCES issue_status (id)
 );

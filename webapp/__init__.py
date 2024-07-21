@@ -60,5 +60,8 @@ def create_app(test_config=None):
     from . import file_upload
     app.register_blueprint(file_upload.bp)
 
+    from . import issues
+    app.register_blueprint(issues.bp)
+
 
     return app

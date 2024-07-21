@@ -10,7 +10,7 @@
           <li><a href="/algotrade">AlgoTrade</a></li>
           <li><a href="/blog">Blog</a></li>
           <li><a href="/notes">Notes</a></li>
-          <li><a href="/cloud-assets">Cloud-Assets</a></li>
+          <li><a href="{{ url_for('issues.index') }}">Issues</a></li>
           <li><a href="/tools">Tools</a></li>
           <li><span>{{ g.user['username'] }}</span>
           <li><a href="{{ url_for('auth.logout') }}">Log Out</a>
@@ -26,7 +26,7 @@
           <li><a href="/algotrade">AlgoTrade</a></li>
           <li><a href="/blog">Blog</a></li>
           <li><a href="/notes">Notes</a></li>
-          <li><a href="/cloud-assets">Cloud-Assets</a></li>
+          <li><a href="{{ url_for('issues.index') }}">Issues</a></li>
           <li><a href="/tools">Tools</a></li>
           <li><span>{{ g.user['username'] }}</span>
           <li><a href="{{ url_for('auth.logout') }}">Log Out</a>
