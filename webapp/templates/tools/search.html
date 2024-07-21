@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% from "_macros/_pagination.html" import pager with context %}
+
+{% block title %}Tools{% endblock %}
+
+{% block head %}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+    <style>
+        h1.page-title {
+            font-family: "Anton", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+        span.card-title {
+            font-family: "Anton", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+        div.card-content,div.card-action {
+            font-family: "Source Sans 3", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-style: normal;
+            font-size: medium;
+        }
+        div.card-content {
+            min-height: 10.5em;
+            max-height: 10.5em;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #4CAF50 #546e7a;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        
+        <div class="col s12">
+            <h1 class="page-title blue-grey-text">Tools</h1>    
+        </div>
+    </div>
+    
+    <div class="row">
+    
+    {% for tool in tools %}
+        <div class="col s12 m4">
+            <div class="card blue-grey darken-1">
+                <div class="card-content white-text">
+                    <span class="card-title">{{ tool['name'] }}</span>
+                    <p>{{ tool['description'].split('\n')|join('<br/>'|safe) }}</p>
+                </div>
+                <div class="card-action">
+                    <a href="{{ url_for(tool['url']) }}">Use tool</a>
+                    <a href="{{ url_for('tools.edit', id=tool['id']) }}">Edit</a>
+                </div>
+            </div>
+        </div>
+    
+    {% endfor %}
+        
+    </div>
+
+    <div class="row">
+        <div class="col s4">
+            {{ pager(page_number, total_record_count, 'tools.filtered', 6, q=search_term) }}
+        </div>
+        <div class="col s4 center-align">
+            <form method="post" action="{{ url_for('tools.filtered') }}">
+                <input id="search_term" name="search_term" type="text" class="validate center-align" value="{{ search_term }}">
+                <label for="search_term">Search</label>
+                <input type="submit" hidden />
+            </form>
+        </div>
+        <div class="col s4 right-align">
+            <a href="{{ url_for('tools.register') }}" class="waves-effect waves-light green btn"><i class="material-icons right">add</i>Register new tool</a>
+        </div>
+    </div>
+    
+    
+</div>
+
+{% endblock %}

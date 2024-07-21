@@ -24,13 +24,29 @@ class ToolRepository:
         self.log.info(f"LOGINFO get_all_tools {page_number}")
         db = get_db()
         tools = db.execute("""
-SELECT 	t.id, t.name, t.description, t.url
-FROM 	tool t 
+SELECT  t.id, t.name, t.description, t.url
+FROM    tool t 
 ORDER BY t.name ASC
 LIMIT ? OFFSET ?;
 """, (self.page_size, offset)).fetchall()
         total_record_count = db.execute("""SELECT COUNT(id) count FROM tool""").fetchone()['count']
         return (tools, total_record_count)
+        
+        
+    def find_tools(self, search_term, page_number):
+        offset = (page_number - 1) * self.page_size
+        self.log.info(f"find_tools {search_term}, {self.page_size}, {offset}")
+        db = get_db()
+        tools = db.execute("""
+SELECT  t.id, t.name, t.description, t.url
+FROM    tool t 
+WHERE   t.name LIKE ?
+ORDER BY t.name ASC
+LIMIT ? OFFSET ?;
+""", (search_term, self.page_size, offset)).fetchall()
+        total_record_count = db.execute("""SELECT COUNT(id) count FROM tool WHERE name LIKE ?""", (search_term,)).fetchone()['count']
+        return (tools, total_record_count)
+
         
     def seed(self, item_count=16):
         tool_description = 'I am a very simple card. I am good at containing small bits of information. I am convenient because I require little markup to use effectively.'
@@ -58,11 +74,10 @@ tool_repository = ToolRepository()
 def index(page_number=1):
     #tool_repository.seed(10)
     (tools, total_record_count) = tool_repository.get_all_tools(page_number)
-    #print(f"page_number is {page_number}")
     return render_template('tools/index.html', tools=tools, 
         total_record_count=total_record_count,page_number=page_number)
 
-@bp.route('/register', methods=('GET', 'POST'))
+@bp.route('/register', methods=['GET', 'POST'])
 @login_required
 def register():
     if request.method == 'POST':
@@ -89,7 +104,7 @@ def register():
     return render_template('tools/register.html')
 
 
-@bp.route('/edit/<string:id>', methods=('GET', 'POST'))
+@bp.route('/edit/<string:id>', methods=['GET', 'POST'])
 @login_required
 def edit(id):
     print(f"editing tool {id}")
@@ -144,7 +159,7 @@ def get_post(id, check_author=True):
 
     return post
 
-@bp.route('/<int:id>/update', methods=('GET', 'POST'))
+@bp.route('/<int:id>/update', methods=['GET', 'POST'])
 @login_required
 def update(id):
     post = get_post(id)
@@ -172,3 +187,33 @@ def update(id):
     return render_template('blog/update.html', post=post)
 
 
+
+@bp.route('/filter', methods=['POST'])
+@bp.route('/filtered/<int:page_number>', methods=['GET', 'POST'])
+@login_required
+def filtered(page_number=1):
+    if request.method == 'POST':
+        search_term = request.form['search_term']
+    if request.method == 'GET' and 'q' in request.args.keys():
+        search_term = request.args['q']
+        
+    if not search_term:
+        parsed_search_term = '*'
+    else:    
+        parsed_search_term = f'*{search_term.strip()}*'
+    parsed_search_term = to_db_wildcard_form(parsed_search_term)
+    
+    (tools, total_record_count) = tool_repository.find_tools(parsed_search_term, page_number)
+    return render_template('tools/search.html', tools=tools, 
+        total_record_count=total_record_count,page_number=page_number,search_term=search_term)
+    
+    
+
+def to_db_wildcard_form(term):
+    import re
+    term = term.replace('*', '%')
+    whitespace = re.compile(r'\s+')
+    new_term = re.sub(whitespace, '%', term)
+    print(f"new_term is {new_term}")
+    return new_term
+    
