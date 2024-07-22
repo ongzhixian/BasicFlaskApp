@@ -63,5 +63,8 @@ def create_app(test_config=None):
     from . import issues
     app.register_blueprint(issues.bp)
 
+    from . import tool_manager
+    app.register_blueprint(tool_manager.bp)
+
 
     return app
