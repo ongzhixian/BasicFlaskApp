@@ -97,3 +97,23 @@ CREATE TABLE IF NOT EXISTS issue (
     FOREIGN KEY (type_id) REFERENCES issue_type (id),
     FOREIGN KEY (status_id) REFERENCES issue_status (id)
 );
+
+
+CREATE TABLE IF NOT EXISTS url (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    create_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    href TEXT NOT NULL,
+    status INTEGER DEFAULT 0
+);
+
+
+
+CREATE TABLE IF NOT EXISTS fixed_deposit (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    create_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    company_name TEXT NOT NULL,
+    interest_per_annum REAL NOT NULL,
+    tenure TEXT NOT NULL,
+    remarks TEXT NULL,
+    FOREIGN KEY (user_id) REFERENCES user (id)
+);

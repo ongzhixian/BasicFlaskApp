@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Blueprint generator{% endblock %}
+
+{% block head %}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+    <style>
+        h1.page-title {
+            font-family: "Anton", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+        span.card-title {
+            font-family: "Anton", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+        div.card-content,div.card-action {
+            font-family: "Source Sans 3", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-style: normal;
+            font-size: medium;
+        }
+        div.card-content {
+            min-height: 10.5em;
+            max-height: 10.5em;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #4CAF50 #546e7a;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col s12">
+            <h1 class="page-title">Create stub</h1>    
+        </div>
+    </div>
+    
+    <form method="POST" enctype="multipart/form-data">
+        <div class="row">
+            <div class="input-field col s3">
+                <i class="material-icons prefix">title</i>
+                <input id="blueprint_title" name="blueprint_title" type="text" class="validate" value="test module" />
+                <label for="blueprint_title">Name of blueprint module</label>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col s12">
+                <button class="btn-flat waves-effect waves-light green white-text" type="submit" name="action" value="Register">Add blueprint
+                    <i class="material-icons right">add</i>
+                </button>
+            </div>
+        </div>
+    </form>
+    
+</div>
+
+{% endblock %}

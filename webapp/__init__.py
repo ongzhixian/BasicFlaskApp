@@ -23,9 +23,30 @@ def create_app(test_config=None):
     except OSError:
         pass
 
+    #load_modules(app)
+    dynamic_load_modules(app)
+
+    return app
+
+def dynamic_load_modules(app):
+    ignore_list = ['__init__', 'db']
+    
+    import importlib
+    
+    with os.scandir('webapp') as dirEntryIterator:
+        for entry in dirEntryIterator:
+            if entry.is_dir(): continue
+            
+            file_name, file_extension = os.path.splitext(entry.name)
+            if file_extension == '.py' and file_name not in ignore_list:
+                module = importlib.import_module(f'.{file_name}', package='webapp')
+                app.register_blueprint(module.bp)
+
+
+def load_modules(app):
     from . import db
     db.init_app(app)
-
+    
     from . import welcome
     app.register_blueprint(welcome.bp)
 
@@ -65,6 +86,7 @@ def create_app(test_config=None):
 
     from . import tool_manager
     app.register_blueprint(tool_manager.bp)
+    
+    from . import fixed_deposit
+    app.register_blueprint(fixed_deposit.bp)
 
-
-    return app
