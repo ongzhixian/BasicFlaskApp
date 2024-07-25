@@ -22,6 +22,12 @@ def create_app(test_config=None):
         os.makedirs(app.instance_path)
     except OSError:
         pass
+        
+    from . import db
+    db.init_app(app)
+
+    from . import e2e
+    e2e.init_app(app)
 
     #load_modules(app)
     dynamic_load_modules(app)
@@ -29,7 +35,7 @@ def create_app(test_config=None):
     return app
 
 def dynamic_load_modules(app):
-    ignore_list = ['__init__', 'db']
+    ignore_list = ['__init__', 'db', 'e2e']
     
     import importlib
     
