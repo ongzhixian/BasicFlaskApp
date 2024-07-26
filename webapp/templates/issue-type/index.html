@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% from "_macros/_pagination.html" import pager with context %}
 
-{% block title %}Users{% endblock %}
+{% block title %}Issue type{% endblock %}
 
 {% block head %}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -25,13 +25,7 @@
             font-style: normal;
             font-size: medium;
         }
-        .issue-title-column {
-            width: 5em;
-        }
-        .issue-type-column {
-            width: 5em;
-        }
-        .issue-status-column {
+        .action-column {
             width: 5em;
         }
     </style>
@@ -41,29 +35,26 @@
 
 <div class="container">
     <div class="row">
-        <h1 class="page-title blue-grey-text">Issues</h1>    
+        
+        <div class="col s12">
+            <h1 class="page-title blue-grey-text">Issue type</h1>    
+        </div>
     </div>
     
     <div class="row">
         <table class="content">
             <thead>
               <tr>
-                  <th class="issue-title-column">Title</th>
-                  <th class="issue-type-column">Type</th>
-                  <th class="issue-status-column">Status (Last update)</th>
+                  <th class="">Title</th>
+                  <th class="action-column center-align">Action</th>
               </tr>
             </thead>
 
             <tbody>
-                {% for issue in issues %}
+                {% for record in records %}
                 <tr>
-                    <td class="issue-title-column">
-                        <a href="{{ url_for('issues.edit', id=issue['id']) }}" class="waves-effect waves-light"><i class="material-icons">edit</i></a>
-                        {{ issue['title'] }}
-                    </td>
-                    <td class="issue-type-column">{{ issue['issue_type'] }}</td>    
-                    <td class="issue-status-column">{{ issue['issue_status'] }} ({{ issue['update_ts'].strftime('%Y-%m-%d') }})</td>
-                    
+                    <td class="">{{ record['title'] }}</td>
+                    <td class="action-column center-align"><a class="waves-effect waves-light" href="{{ url_for('issue-type.edit', id=record['id']) }}"><i class="material-icons">edit</i></a></td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -72,10 +63,10 @@
 
     <div class="row">
         <div class="col s6">
-            {{ pager(page_number, total_record_count, 'issues.index', 10) }}
+            {{ pager(page_number, total_record_count, 'issue-type.index', 10) }}
         </div>
         <div class="col s6 right-align">
-            <a href="{{ url_for('issues.register') }}" class="waves-effect waves-light green btn"><i class="material-icons right">add</i>Register new issue</a>
+            <a href="{{ url_for('issue-type.register') }}" class="waves-effect waves-light green btn"><i class="material-icons right">add</i>Register new issue type</a>
         </div>
     </div>
     

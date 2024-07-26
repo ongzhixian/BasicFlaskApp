@@ -57,7 +57,7 @@ def to_module_name(term):
     
 
 def create_python_file(module_file_name, module_name):
-    file_path = f"webapp/{module_file_name}.txt"
+    file_path = f"webapp/{module_file_name}.py"
     with open(file_path, 'w') as file:
         file.write(f"""import os
 from flask import (
