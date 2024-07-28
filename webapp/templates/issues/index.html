@@ -58,7 +58,7 @@
                 {% for issue in issues %}
                 <tr>
                     <td class="issue-title-column">
-                        <a href="{{ url_for('issues.edit', id=issue['id']) }}" class="waves-effect waves-light"><i class="material-icons">edit</i></a>
+                        <a href="{{ url_for('issues.edit', id=issue['id']) }}" class="waves-effect waves-light"><i class="material-icons green-text">edit</i></a>
                         {{ issue['title'] }}
                     </td>
                     <td class="issue-type-column">{{ issue['issue_type'] }}</td>    
