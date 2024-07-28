@@ -46,7 +46,7 @@ SELECT id, title FROM bank WHERE id = ?;
 
     def update_record(self, id, banks_title):
         db = get_db()
-        db.execute('UPDATE topic SET title = ? WHERE id = ?;',
+        db.execute('UPDATE bank SET title = ? WHERE id = ?;',
             (banks_title, id)
         )
         db.commit()
