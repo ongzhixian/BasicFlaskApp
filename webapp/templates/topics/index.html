@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% from "_macros/_pagination.html" import pager with context %}
+
+{% block title %}Topics{% endblock %}
+
+{% block head %}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet" />
+    <style>
+        h1.page-title {
+            font-family: "Bebas Neue", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+        table.content th {
+            font-family: "Source Sans 3", sans-serif;
+            font-weight: 700;
+            font-style: normal;
+        }
+        table.content td {
+            font-family: "Source Sans 3", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-style: normal;
+            font-size: medium;
+        }
+        .action-column {
+            width: 5em;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        
+        <div class="col s12">
+            <h1 class="page-title blue-grey-text">Topics</h1>    
+        </div>
+    </div>
+    
+    <div class="row">
+        <table class="content">
+            <thead>
+              <tr>
+                  <th class="">Title</th>
+                  <th class="action-column center-align">Action</th>
+              </tr>
+            </thead>
+
+            <tbody>
+                {% for record in records %}
+                <tr>
+                    <td class="">{{ record['title'] }}</td>
+                    <td class="action-column center-align"><a class="waves-effect waves-light" href="{{ url_for('topics.edit', id=record['id']) }}"><i class="material-icons">edit</i></a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="row">
+        <div class="col s6">
+            {{ pager(page_number, total_record_count, 'topics.index', 10) }}
+        </div>
+        <div class="col s6 right-align">
+            <a href="{{ url_for('topics.register') }}" class="waves-effect waves-light green btn"><i class="material-icons right">add</i>Register new topic</a>
+        </div>
+    </div>
+    
+    
+</div>
+
+{% endblock %}
