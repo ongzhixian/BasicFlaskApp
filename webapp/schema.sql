@@ -117,3 +117,9 @@ CREATE TABLE IF NOT EXISTS fixed_deposit (
     remarks TEXT NULL,
     FOREIGN KEY (user_id) REFERENCES user (id)
 );
+
+
+CREATE TABLE IF NOT EXISTS topic (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL
+);
