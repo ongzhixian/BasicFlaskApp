@@ -63,6 +63,15 @@ SELECT id, title FROM topic WHERE id = ?;
 
 topic_repository = TopicRepository()
 
+@bp.route('/api/search')
+def api_search():
+    result = {
+        "is_success": True,
+        "message": "OK world"
+    }
+    return json.dumps(result)
+    
+
 @bp.route('/')
 @bp.route('/<int:page_number>')
 def index(page_number=1):

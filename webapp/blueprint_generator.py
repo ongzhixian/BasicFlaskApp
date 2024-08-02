@@ -68,21 +68,6 @@ def create_stub_index_html(module_title, module_name, target_folder_path):
         file.write(out_html)
 
 
-def replace_template_tokens(template_content, template_values):
-    import pdb
-    import re
-    new_content = template_content
-    for key in template_values:
-        # Find a token that looks like "{!module_title}"
-        token = f'{{!{key}}}'
-        print(f'Replacing {token}')
-        new_content = re.sub(token, template_values[key], new_content)
-    return new_content
-        
-
-
-
-
 def create_stub_python_file(module_file_name, module_name):
     file_path = f"webapp/{module_file_name}.py"
     # Read template file
@@ -116,3 +101,13 @@ def to_module_name(term):
     print(f"new_term is {new_term}")
     return new_term
     
+def replace_template_tokens(template_content, template_values):
+    import pdb
+    import re
+    new_content = template_content
+    for key in template_values:
+        # Find a token that looks like "{!module_title}"
+        token = f'{{!{key}}}'
+        print(f'Replacing {token}')
+        new_content = re.sub(token, template_values[key], new_content)
+    return new_content
