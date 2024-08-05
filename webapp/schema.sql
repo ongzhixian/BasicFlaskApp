@@ -69,11 +69,12 @@ CREATE TABLE IF NOT EXISTS blog_post (
 
 CREATE TABLE IF NOT EXISTS issue_type (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL
+    title TEXT NOT NULL,
+    weight INTEGER NOT NULL
 );
-INSERT INTO issue_type (title) VALUES ('Bug');
-INSERT INTO issue_type (title) VALUES ('Feature');
-
+INSERT INTO issue_type (title, weight) VALUES ('Bug', 9);
+INSERT INTO issue_type (title, weight) VALUES ('Feature', 6);
+INSERT INTO issue_type (title, weight) VALUES ('Enhancement', 6);
 
 CREATE TABLE IF NOT EXISTS issue_status (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
