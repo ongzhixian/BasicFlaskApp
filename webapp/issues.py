@@ -28,7 +28,7 @@ FROM issue i
 JOIN issue_type ty ON i.type_id = ty.id
 JOIN issue_status st ON i.status_id = st.id
 JOIN issue_priority pr ON i.priority_id = pr.id
-ORDER BY pr.weight DESC, i.title ASC
+ORDER BY (pr.weight * st.weight * ty.weight) DESC, i.title ASC
 LIMIT ? OFFSET ?;
 """, (self.page_size, offset)).fetchall()
         total_record_count = db.execute("""SELECT COUNT(i.id) count FROM issue i
