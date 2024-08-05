@@ -83,6 +83,16 @@ INSERT INTO issue_status (title) VALUES ('New');
 INSERT INTO issue_status (title) VALUES ('Assigned');
 INSERT INTO issue_status (title) VALUES ('Closed');
 
+CREATE TABLE IF NOT EXISTS issue_priority (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    weight INTEGER NOT NULL
+);
+INSERT INTO issue_priority (title, weight) VALUES ('High', 9);
+INSERT INTO issue_priority (title, weight) VALUES ('Medium', 6);
+INSERT INTO issue_priority (title, weight) VALUES ('Low', 3);
+
+
 
 CREATE TABLE IF NOT EXISTS issue (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -93,9 +103,11 @@ CREATE TABLE IF NOT EXISTS issue (
     title TEXT NOT NULL,
     description TEXT NULL,
     status_id INTEGER NOT NULL,
+    priority_id INTEGER,
     FOREIGN KEY (user_id) REFERENCES user (id),
     FOREIGN KEY (type_id) REFERENCES issue_type (id),
     FOREIGN KEY (status_id) REFERENCES issue_status (id)
+    FOREIGN KEY (priority_id) REFERENCES issue_priority (id)
 );
 
 
