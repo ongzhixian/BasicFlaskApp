@@ -77,11 +77,13 @@ INSERT INTO issue_type (title) VALUES ('Feature');
 
 CREATE TABLE IF NOT EXISTS issue_status (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL
+    title TEXT NOT NULL,
+    weight INTEGER NOT NULL
 );
-INSERT INTO issue_status (title) VALUES ('New');
-INSERT INTO issue_status (title) VALUES ('Assigned');
-INSERT INTO issue_status (title) VALUES ('Closed');
+INSERT INTO issue_status (title, weight) VALUES ('New', 9);
+INSERT INTO issue_status (title, weight) VALUES ('Assigned', 6);
+INSERT INTO issue_status (title, weight) VALUES ('Closed', 1);
+INSERT INTO issue_status (title, weight) VALUES ('Shelved', 3);
 
 CREATE TABLE IF NOT EXISTS issue_priority (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -91,6 +93,7 @@ CREATE TABLE IF NOT EXISTS issue_priority (
 INSERT INTO issue_priority (title, weight) VALUES ('High', 9);
 INSERT INTO issue_priority (title, weight) VALUES ('Medium', 6);
 INSERT INTO issue_priority (title, weight) VALUES ('Low', 3);
+INSERT INTO issue_priority (title, weight) VALUES ('Backlog', 1);
 
 
 

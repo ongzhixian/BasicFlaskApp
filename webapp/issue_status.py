@@ -23,8 +23,8 @@ class IssueStatusRepository:
         offset = (page_number - 1) * self.page_size
         db = get_db()
         records = db.execute("""
-SELECT id, title FROM issue_status 
-ORDER BY title ASC
+SELECT id, title, weight FROM issue_status 
+ORDER BY weight DESC, title ASC
 LIMIT ? OFFSET ?;
 """, (self.page_size, offset)).fetchall()
         total_record_count = db.execute("""SELECT COUNT(id) count FROM issue_status;""").fetchone()['count']
@@ -33,21 +33,21 @@ LIMIT ? OFFSET ?;
     def get_record(self, id):
         db = get_db()
         record = db.execute("""
-SELECT id, title FROM issue_status WHERE id = ?;
+SELECT id, title, weight FROM issue_status WHERE id = ?;
 """, (id,)).fetchone()
         return record
 
-    def add_new_record(self, issue_status_title):
+    def add_new_record(self, issue_status_title, issue_status_weight):
         db = get_db()
-        db.execute('INSERT INTO issue_status (title) VALUES (?);',
-            (issue_status_title,)
+        db.execute('INSERT INTO issue_status (title, weight) VALUES (?, ?);',
+            (issue_status_title,issue_status_weight)
         )
         db.commit()
 
-    def update_record(self, id, issue_status_title):
+    def update_record(self, id, issue_status_title, issue_status_weight):
         db = get_db()
-        db.execute('UPDATE issue_status SET title = ? WHERE id = ?;',
-            (issue_status_title, id)
+        db.execute('UPDATE issue_status SET title = ?, weight = ? WHERE id = ?;',
+            (issue_status_title, issue_status_weight, id)
         )
         db.commit()
 
@@ -78,6 +78,7 @@ def index(page_number=1):
 def register():
     if request.method == 'POST':
         issue_status_title = request.form['issue_status_title']
+        issue_status_weight = request.form['issue_status_weight']
         #role_description = request.form['role_description']
         error = None
 
@@ -87,7 +88,7 @@ def register():
         if error is not None:
             flash(error)
         else:
-            issue_status_repository.add_new_record(issue_status_title)
+            issue_status_repository.add_new_record(issue_status_title, issue_status_weight)
             return redirect(url_for('issue-status.index'))
 
     return render_template('issue-status/register.html')
@@ -98,6 +99,7 @@ def register():
 def edit(id):
     if request.method == 'POST':
         issue_status_title = request.form['issue_status_title']
+        issue_status_weight = request.form['issue_status_weight']
         action = request.form['action']
         #role_description = request.form['role_description']
         error = None
@@ -111,7 +113,7 @@ def edit(id):
             if action == 'Delete':
                 issue_status_repository.delete_record(id)
             else:
-                issue_status_repository.update_record(id, issue_status_title)
+                issue_status_repository.update_record(id, issue_status_title, issue_status_weight)
             return redirect(url_for('issue-status.index'))
     record = issue_status_repository.get_record(id)
     return render_template('issue-status/edit.html', record=record)
