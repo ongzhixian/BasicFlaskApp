@@ -20,13 +20,15 @@ class IssueRepository:
 
     def get_paged_records(self,page_number):
         offset = (page_number - 1) * self.page_size
+        print(offset)
         db = get_db()
         records = db.execute("""
-SELECT i.id, i.update_ts, i.title, ty.title issue_type, st.title issue_status 
+SELECT i.id, i.update_ts, i.title, ty.title issue_type, st.title issue_status, pr.title issue_priority
 FROM issue i
 JOIN issue_type ty ON i.type_id = ty.id
 JOIN issue_status st ON i.status_id = st.id
-ORDER BY i.title ASC
+JOIN issue_priority pr ON i.priority_id = pr.id
+ORDER BY pr.weight DESC, i.title ASC
 LIMIT ? OFFSET ?;
 """, (self.page_size, offset)).fetchall()
         total_record_count = db.execute("""SELECT COUNT(i.id) count FROM issue i
@@ -38,7 +40,7 @@ JOIN issue_status st ON i.status_id = st.id""").fetchone()['count']
     def get_issue(self, id):
         db = get_db()
         record = db.execute("""
-SELECT i.id, i.update_ts, i.title, i.description, i.type_id, i.status_id
+SELECT i.id, i.update_ts, i.title, i.description, i.type_id, i.status_id, i.priority_id
 FROM issue i
 WHERE i.id = ?;
 """, (id,)).fetchone()
@@ -53,20 +55,25 @@ WHERE i.id = ?;
         db = get_db()
         records = db.execute("""SELECT id, title FROM issue_status;""").fetchall()
         return records
+    
+    def get_issue_priorities(self):
+        db = get_db()
+        records = db.execute("""SELECT id, title FROM issue_priority ORDER BY weight DESC;""").fetchall()
+        return records
         
         
-    def add_issue(self, type_id, title, description, user_id):
+    def add_issue(self, type_id, priority_id, title, description, user_id):
         db = get_db()
         issue_status_id = 1
-        db.execute("""INSERT INTO issue (type_id, title, description, status_id, user_id) VALUES (?, ?, ?, ?, ?);""",
-            (type_id, title, description, issue_status_id, user_id)
+        db.execute("""INSERT INTO issue (type_id, priority_id, title, description, status_id, user_id) VALUES (?, ?, ?, ?, ?, ?);""",
+            (type_id, priority_id, title, description, issue_status_id, user_id)
         )
         db.commit()
         
-    def update_issue(self, issue_type_id, issue_title, issue_description, issue_status_id, id):
+    def update_issue(self, issue_type_id, issue_title, issue_description, issue_status_id, issue_priority_id, id):
         db = get_db()
-        db.execute("""UPDATE issue SET type_id = ?, title = ?, description = ?, status_id = ? WHERE id = ?;""",
-            (issue_type_id, issue_title, issue_description, issue_status_id, id)
+        db.execute("""UPDATE issue SET type_id = ?, title = ?, description = ?, status_id = ?, priority_id = ? WHERE id = ?;""",
+            (issue_type_id, issue_title, issue_description, issue_status_id, issue_priority_id, id)
         )
         db.commit()
         
@@ -133,6 +140,7 @@ def api_search():
 def register():
     if request.method == 'POST':
         issue_type = request.form['issue_type']
+        issue_priority = request.form['issue_priority']
         issue_title = request.form['issue_title']
         issue_description = request.form['issue_description']
         
@@ -144,10 +152,12 @@ def register():
         if error is not None:
             flash(error)
         else:
-            issue_repository.add_issue(issue_type, issue_title, issue_description, g.user['id'])
+            issue_repository.add_issue(issue_type, issue_priority, issue_title, issue_description, g.user['id'])
             return redirect(url_for('issues.index'))
 
-    return render_template('issues/register.html')
+    issue_types = issue_repository.get_issue_types()
+    issue_priorities = issue_repository.get_issue_priorities()
+    return render_template('issues/register.html', issue_types=issue_types, issue_priorities=issue_priorities)
 
 
 @bp.route('/edit/<string:id>', methods=('GET', 'POST'))
@@ -157,6 +167,7 @@ def edit(id):
         issue_status = request.form['issue_status']
         issue_type = request.form['issue_type']
         issue_title = request.form['issue_title']
+        issue_priority = request.form['issue_priority']
         issue_description = request.form['issue_description']
         error = None
 
@@ -166,10 +177,11 @@ def edit(id):
         if error is not None:
             flash(error)
         else:
-            issue_repository.update_issue(issue_type, issue_title, issue_description, issue_status, id)
+            issue_repository.update_issue(issue_type, issue_title, issue_description, issue_status, issue_priority, id)
             return redirect(url_for('issues.index'))
     
     issue_statuses = issue_repository.get_issue_statuses()
     issue_types = issue_repository.get_issue_types()
+    issue_priorities = issue_repository.get_issue_priorities()
     issue = issue_repository.get_issue(id)
-    return render_template('issues/edit.html', issue=issue, issue_types=issue_types, issue_statuses=issue_statuses)
+    return render_template('issues/edit.html', issue=issue, issue_types=issue_types, issue_statuses=issue_statuses, issue_priorities=issue_priorities)

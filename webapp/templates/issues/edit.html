@@ -58,6 +58,17 @@
                 </select>
                 <label>Issue status</label>
             </div>
+
+            <div class="input-field col s3">
+                <select name="issue_priority">
+                  <option value="" disabled selected>Choose your option</option>
+                  {% for issue_priority in issue_priorities %}
+                  <option value="{{ issue_priority['id'] }}" {% if issue_priority['id'] == issue['priority_id'] %}selected{% endif %}>{{ issue_priority['title'] }}</option>
+                  {% endfor %}
+                </select>
+                <label>Issue priority</label>
+            </div>
+
         </div>
         
         <div class="row">

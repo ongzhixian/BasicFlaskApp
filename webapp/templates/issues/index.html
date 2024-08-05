@@ -31,8 +31,11 @@
         .issue-type-column {
             width: 5em;
         }
-        .issue-status-column {
+        .issue-priority-column {
             width: 5em;
+        }
+        .issue-status-column {
+            width: 12em;
         }
     </style>
 {% endblock %}
@@ -48,21 +51,23 @@
         <table class="content">
             <thead>
               <tr>
-                  <th class="issue-title-column">Title</th>
+                  <th class="">Title</th>
                   <th class="issue-type-column">Type</th>
-                  <th class="issue-status-column">Status (Last update)</th>
+                  <th class="issue-priority-column">Priority</th>
+                  <th class="issue-status-column center-align">Status<br/>(Last update)</th>
               </tr>
             </thead>
 
             <tbody>
                 {% for issue in issues %}
                 <tr>
-                    <td class="issue-title-column">
+                    <td class="">
                         <a href="{{ url_for('issues.edit', id=issue['id']) }}" class="waves-effect waves-light"><i class="material-icons green-text">edit</i></a>
                         {{ issue['title'] }}
                     </td>
-                    <td class="issue-type-column">{{ issue['issue_type'] }}</td>    
-                    <td class="issue-status-column">{{ issue['issue_status'] }} ({{ issue['update_ts'].strftime('%Y-%m-%d') }})</td>
+                    <td class="issue-type-column">{{ issue['issue_type'] }}</td>
+                    <td class="issue-type-column">{{ issue['issue_priority'] }}</td>
+                    <td class="issue-status-column center-align">{{ issue['issue_status'] }}<br/>({{ issue['update_ts'].strftime('%Y-%m-%d %H:%M:%S') }})</td>
                     
                 </tr>
                 {% endfor %}

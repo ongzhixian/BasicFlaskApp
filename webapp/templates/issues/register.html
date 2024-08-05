@@ -38,15 +38,27 @@
     <form method="post">
         
         <div class="row">
-            
+
             <div class="input-field col s3">
                 <select name="issue_type">
                   <option value="" disabled selected>Choose your option</option>
-                  <option value="1">Bug</option>
-                  <option value="2">Feature</option>
+                  {% for issue_type in issue_types %}
+                  <option value="{{ issue_type['id'] }}">{{ issue_type['title'] }}</option>
+                  {% endfor %}
                 </select>
                 <label>Issue type</label>
             </div>
+
+            <div class="input-field col s3">
+                <select name="issue_priority">
+                  <option value="" disabled selected>Choose your option</option>
+                  {% for issue_priority in issue_priorities %}
+                  <option value="{{ issue_priority['id'] }}">{{ issue_priority['title'] }}</option>
+                  {% endfor %}
+                </select>
+                <label>Issue priority</label>
+            </div>
+
         </div>
         
         <div class="row">
