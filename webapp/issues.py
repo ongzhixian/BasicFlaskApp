@@ -72,7 +72,7 @@ WHERE i.id = ?;
         
     def update_issue(self, issue_type_id, issue_title, issue_description, issue_status_id, issue_priority_id, id):
         db = get_db()
-        db.execute("""UPDATE issue SET type_id = ?, title = ?, description = ?, status_id = ?, priority_id = ? WHERE id = ?;""",
+        db.execute("""UPDATE issue SET type_id = ?, title = ?, description = ?, status_id = ?, priority_id = ?, update_ts = CURRENT_TIMESTAMP WHERE id = ?;""",
             (issue_type_id, issue_title, issue_description, issue_status_id, issue_priority_id, id)
         )
         db.commit()
@@ -82,19 +82,26 @@ WHERE i.id = ?;
         record = db.execute("""DELETE blog_post WHERE user_id = ? AND id = ?';""", (user_id, id)).fetchone()
         return record    
     
-    # OBSOLETE
-    def search(self, query):    
+    def search(self, wildcard_query, page_number):
+        offset = (page_number - 1) * self.page_size
         db = get_db()
         records = db.execute("""
-SELECT u.id, u.username 
-FROM user u 
-WHERE username LIKE ?
-ORDER BY u.username ASC
-LIMIT 10;
-""", (query,)).fetchall()
-        return records
-        
-        
+SELECT i.id, i.update_ts, i.title, ty.title issue_type, st.title issue_status, pr.title issue_priority
+FROM issue i
+JOIN issue_type ty ON i.type_id = ty.id
+JOIN issue_status st ON i.status_id = st.id
+JOIN issue_priority pr ON i.priority_id = pr.id
+WHERE i.title LIKE ?
+ORDER BY (pr.weight * st.weight * ty.weight) DESC, i.title ASC
+LIMIT ? OFFSET ?;
+""", (wildcard_query, self.page_size, offset)).fetchall()
+        total_record_count = db.execute("""SELECT COUNT(i.id) count FROM issue i
+JOIN issue_type ty ON i.type_id = ty.id
+JOIN issue_status st ON i.status_id = st.id
+JOIN issue_priority pr ON i.priority_id = pr.id
+WHERE i.title LIKE ?""", (wildcard_query,)).fetchone()['count']
+        return (records, total_record_count)
+
     def seed(self, item_count=16):
         db = get_db()
         for i in range (1, item_count + 1):
@@ -130,8 +137,9 @@ def index(page_number=1):
 @bp.route('/api/search')
 def api_search():
     query = request.args.get('query')
-    print(f"api search for {query}")
-    records = issue_repository.search(f"%{query}%")
+    page = 1 if request.args.get('page') is None else int(request.args.get('page'))
+    print(f"api search for {query} on page {page}")
+    (records, total_record_count) = issue_repository.search(f"%{query}%", page)
     return jsonify([dict(record) for record in records])
     
 
@@ -169,6 +177,7 @@ def edit(id):
         issue_title = request.form['issue_title']
         issue_priority = request.form['issue_priority']
         issue_description = request.form['issue_description']
+        
         error = None
 
         if not issue_title:

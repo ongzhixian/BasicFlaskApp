@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% from "_macros/_pagination.html" import pager with context %}
 
-{% block title %}Users{% endblock %}
+{% block title %}Issues{% endblock %}
 
 {% block head %}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -46,6 +46,13 @@
     <div class="row">
         <h1 class="page-title blue-grey-text">Issues</h1>    
     </div>
+
+    <div class="row">
+        <div class="input-field col s12">
+            <input type="text" id="search_term" class="autocomplete">
+            <label for="search_term">Search</label>
+        </div>
+    </div>
     
     <div class="row">
         <table class="content">
@@ -87,4 +94,62 @@
     
 </div>
 
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+    'use strict';
+
+    // let variables declaration
+    // functions
+    // constants
+
+    let searchTermAutoComplete;
+
+    function debounce(func, timeout = 300) {
+        let timer;
+        return (...args) => {
+            clearTimeout(timer);
+            timer = setTimeout(() => { func.apply(this, args); }, timeout);
+        };
+    }
+
+    const searchTermTextInput = document.getElementById('search_term');
+
+    const fetchSearchResults = debounce(async () => {
+        // 1. Call api
+        // 2. 
+        console.log("call api");
+
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        const response = await fetch("/issues/api/search?query=kanban", {
+            method: "GET",
+            // body: JSON.stringify({ username: "example" }),
+            headers: myHeaders,
+        });
+
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+
+        const json = await response.json();
+        console.log(json);
+
+
+        searchTermAutoComplete.updateData({
+            "Apple": null,
+            "Microsoft": null,
+            "Google": 'https://placehold.it/250x250'
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        searchTermTextInput.addEventListener('keyup', fetchSearchResults);
+        searchTermAutoComplete = M.Autocomplete.init(searchTermTextInput, {});    
+    });
+
+</script>
 {% endblock %}
