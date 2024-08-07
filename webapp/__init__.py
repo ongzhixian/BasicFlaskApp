@@ -1,5 +1,5 @@
 import os
-
+from datetime import datetime
 from flask import Flask
 
 def create_app(test_config=None):
@@ -96,3 +96,8 @@ def load_modules(app):
     from . import fixed_deposit
     app.register_blueprint(fixed_deposit.bp)
 
+
+def serializer(obj): 
+    if isinstance(obj, datetime): 
+        return obj.isoformat() 
+    raise TypeError("Type not serializable") 

@@ -1,3 +1,4 @@
+import json
 from logging import getLogger
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for, jsonify
@@ -118,10 +119,8 @@ WHERE i.title LIKE ?""", (wildcard_query,)).fetchone()['count']
 
 ##############################
 # ROUTES
-
+from webapp import serializer
 issue_repository = IssueRepository()
-
-
 
 @bp.route('/')
 @bp.route('/<int:page_number>')
@@ -140,7 +139,12 @@ def api_search():
     page = 1 if request.args.get('page') is None else int(request.args.get('page'))
     print(f"api search for {query} on page {page}")
     (records, total_record_count) = issue_repository.search(f"%{query}%", page)
-    return jsonify([dict(record) for record in records])
+    response = {
+        'total_record_count': total_record_count,
+        'records': [dict(record) for record in records]
+    }
+    return json.dumps(response, default=serializer)
+    #return jsonify([dict(record) for record in records])
     
 
 @bp.route('/register', methods=('GET', 'POST'))

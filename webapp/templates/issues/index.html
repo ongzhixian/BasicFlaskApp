@@ -115,6 +115,67 @@
         };
     }
 
+    const page = {
+        tbody: document.querySelector('table').tBodies[0],
+        updateRows : function(json) {
+            console.log("Call updateRows");
+            // document.getElementsByTagName('table')[0].replaceChildren(); // Clear
+            // let table = document.querySelector('table');
+            // let tbody = table.tBodies[0];
+            // tbody.replaceChildren();
+            page.tbody.replaceChildren();
+
+            for (let record of json.records) {
+                let row = page.tbody.insertRow();
+                page.addTitleCell(row, record);
+                page.addIssueTypeCell(row, record);
+                page.addIssuePriorityCell(row, record);
+                page.addIssueStatusCell(row, record);
+            }
+        },
+        addTitleCell: function(row, record) {
+            let cell = row.insertCell();
+
+            // <a href="/issues/edit/25" class="waves-effect waves-light"><i class="material-icons green-text">edit</i></a>
+            let icon = document.createElement('i');
+            icon.classList.add('material-icons', 'green-text');
+            icon.innerText = 'edit';
+
+            let anchor = document.createElement('a');
+            anchor.classList.add('waves-effect', 'waves-light');
+            anchor.href = `/issues/edit/${record['id']}`;
+            anchor.appendChild(icon);
+            
+            cell.appendChild(anchor);
+            cell.append(record['title']);
+            //cell.innerHTML = record['title'];
+        },
+        addIssueTypeCell: function(row, record) {
+            let cell = row.insertCell();
+            cell.innerHTML = record['issue_type'];
+        },
+        addIssuePriorityCell: function(row, record) {
+            let cell = row.insertCell();
+            cell.innerHTML = record['issue_priority'];
+        },
+        addIssueStatusCell: function(row, record) {
+            let cell = row.insertCell();
+            cell.classList.add('issue-status-column', 'center-align');
+            cell.append(record['issue_status']);
+            cell.appendChild(document.createElement('br'));
+            cell.append(`(${record['update_ts'].replace('T',' ')})`);
+
+            // <td class="issue-status-column center-align">New<br>(2024-08-05 15:41:09)</td>
+
+
+
+
+            //cell.innerHTML = record['issue_status'];
+            //debugger; //  { id: 21, update_ts: "2024-08-05T14:34:27", title: "Create a kanban tool", issue_type: "Feature", issue_status: "New", issue_priority: "Medium" }
+        }
+
+    };
+
     const searchTermTextInput = document.getElementById('search_term');
 
     const fetchSearchResults = debounce(async () => {
@@ -125,7 +186,7 @@
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
 
-        const response = await fetch("/issues/api/search?query=kanban", {
+        const response = await fetch(`/issues/api/search?query=${encodeURIComponent(searchTermTextInput.value)}`, {
             method: "GET",
             // body: JSON.stringify({ username: "example" }),
             headers: myHeaders,
@@ -137,13 +198,16 @@
 
         const json = await response.json();
         console.log(json);
+        page.updateRows(json);
+        
+        // Update rows
+        // Update pager
 
-
-        searchTermAutoComplete.updateData({
-            "Apple": null,
-            "Microsoft": null,
-            "Google": 'https://placehold.it/250x250'
-        });
+        // searchTermAutoComplete.updateData({
+        //     "Apple": null,
+        //     "Microsoft": null,
+        //     "Google": 'https://placehold.it/250x250'
+        // });
     });
 
     document.addEventListener('DOMContentLoaded', function() {
