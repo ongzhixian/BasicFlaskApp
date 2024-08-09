@@ -117,6 +117,8 @@
 
     const page = {
         tbody: document.querySelector('table').tBodies[0],
+        pager: document.querySelector('ul.pagination'),
+        pageSize : 10,
         updateRows : function(json) {
             console.log("Call updateRows");
             // document.getElementsByTagName('table')[0].replaceChildren(); // Clear
@@ -164,21 +166,128 @@
             cell.append(record['issue_status']);
             cell.appendChild(document.createElement('br'));
             cell.append(`(${record['update_ts'].replace('T',' ')})`);
-
-            // <td class="issue-status-column center-align">New<br>(2024-08-05 15:41:09)</td>
-
-
-
-
-            //cell.innerHTML = record['issue_status'];
             //debugger; //  { id: 21, update_ts: "2024-08-05T14:34:27", title: "Create a kanban tool", issue_type: "Feature", issue_status: "New", issue_priority: "Medium" }
+        },
+        addPreviousButton: function(pageNumber, pageCount, query) {
+            // <li class="disabled"><a><i class="material-icons">chevron_left</i></a></li>
+
+            let icon = document.createElement('i');
+            icon.classList.add('material-icons', 'green-text');
+            icon.innerText = 'chevron_left';
+
+            let previousPageNumber = pageNumber > 1 ? pageNumber - 1 : pageNumber;
+            let anchor = document.createElement('a');
+            //anchor.href = `${query}&page=${previousPageNumber}`;
+            if (pageNumber !== 1)
+                anchor.onclick = () => page.goToPage(`${query}&page=${previousPageNumber}`);
+            anchor.append(icon);
+
+            let listItem = document.createElement('li');
+            if (pageNumber == 1)
+                listItem.classList.add('disabled');
+            else
+                listItem.classList.add('waves-effect');
+            listItem.append(anchor);
+
+            page.pager.appendChild(listItem);
+        },
+        addNextButton: function(pageNumber, pageCount, query) {
+            // <li class="waves-effect"><a href="/issues/2"><i class="material-icons">chevron_right</i></a></li>
+
+            let icon = document.createElement('i');
+            icon.classList.add('material-icons', 'green-text');
+            icon.innerText = 'chevron_right';
+
+            let nextPageNumber = pageNumber;
+            nextPageNumber = pageNumber < pageCount ? nextPageNumber = pageNumber + 1 : pageNumber;
+            let anchor = document.createElement('a');
+            //anchor.href = `${query}&page=${nextPageNumber}`;
+            if (pageNumber < pageCount)
+                anchor.onclick = () => page.goToPage(`${query}&page=${nextPageNumber}`);
+            anchor.append(icon);
+
+            let listItem = document.createElement('li');
+            if (pageNumber >= pageCount)
+                listItem.classList.add('disabled');
+            else
+                listItem.classList.add('waves-effect');
+            listItem.append(anchor);
+
+            page.pager.appendChild(listItem);
+        },
+        addPageLinks: function(pageNumber, pageCount, query) {
+            // <li class="active green"><a href="/issues/1">1</a></li>
+            // <li><a href="/issues/2">2</a></li>
+
+            for (let i = 1; i <= pageCount; i++) {
+
+                let anchor = document.createElement('a');
+                // if (pageNumber !== i) 
+                //     anchor.href = `${query}&page=${i}`;
+                anchor.onclick = () => page.goToPage(`${query}&page=${i}`);
+                anchor.append(i);
+
+                let listItem = document.createElement('li');
+                if (pageNumber === i)
+                    listItem.classList.add('active', 'green');
+                else 
+                    listItem.classList.add('waves-effect');
+                
+                listItem.append(anchor);
+                page.pager.appendChild(listItem);
+            }
+
+        },
+        goToPage: async function(query) {
+            console.log('goto page function called: ' + query);
+            await fetchSearch(query);
+        },
+        updatePaginator: function(json, query) {
+            page.pager.replaceChildren();
+
+            // Some math to calculate total page numbers
+            let part_page_count = (json.total_record_count % page.pageSize) == 0 ? 0 : 1;
+            let page_count = Math.floor(json.total_record_count / page.pageSize) + part_page_count;
+
+            page.addPreviousButton(json.page, page_count, query);
+            page.addPageLinks(json.page, page_count, query);
+            page.addNextButton(json.page, page_count, query);
         }
 
     };
 
     const searchTermTextInput = document.getElementById('search_term');
 
-    const fetchSearchResults = debounce(async () => {
+    async function fetchSearch(query) {
+        console.log("call api fetchSearch");
+
+        let searchApiUrl = `/issues/api/search?query=${encodeURIComponent(searchTermTextInput.value)}`;
+        const requestHeaders = new Headers();
+        requestHeaders.append("Content-Type", "application/json");
+
+        const response = await fetch(query ?? searchApiUrl, {
+            method: "GET",
+            headers: requestHeaders,
+        });
+
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+        
+        const json = await response.json();
+        page.updateRows(json);
+        page.updatePaginator(json, searchApiUrl);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {;
+        searchTermTextInput.addEventListener('keyup', debounce(async () => fetchSearch()));
+        searchTermAutoComplete = M.Autocomplete.init(searchTermTextInput, {});    
+    });
+
+
+    // obsolete use/see fetchSearch
+    // Keep for reference
+    const xxxfetchSearchResults = debounce(async () => {
         // 1. Call api
         // 2. 
         console.log("call api");
@@ -199,6 +308,7 @@
         const json = await response.json();
         console.log(json);
         page.updateRows(json);
+        page.updatePaginator(json, `/issues/api/search?query=${encodeURIComponent(searchTermTextInput.value)}`);
         
         // Update rows
         // Update pager
@@ -208,11 +318,6 @@
         //     "Microsoft": null,
         //     "Google": 'https://placehold.it/250x250'
         // });
-    });
-
-    document.addEventListener('DOMContentLoaded', function() {
-        searchTermTextInput.addEventListener('keyup', fetchSearchResults);
-        searchTermAutoComplete = M.Autocomplete.init(searchTermTextInput, {});    
     });
 
 </script>

@@ -141,7 +141,8 @@ def api_search():
     (records, total_record_count) = issue_repository.search(f"%{query}%", page)
     response = {
         'total_record_count': total_record_count,
-        'records': [dict(record) for record in records]
+        'records': [dict(record) for record in records],
+        'page': page
     }
     return json.dumps(response, default=serializer)
     #return jsonify([dict(record) for record in records])
