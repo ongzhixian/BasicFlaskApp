@@ -102,7 +102,6 @@ def to_module_name(term):
     return new_term
     
 def replace_template_tokens(template_content, template_values):
-    import pdb
     import re
     new_content = template_content
     for key in template_values:

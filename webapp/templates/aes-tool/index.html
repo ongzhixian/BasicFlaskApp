@@ -69,8 +69,8 @@
 
     <div class="row">
         <div class="input-field col s12">
-            <input type="text" id="plain_text" placeholder="Text to encrypt" class="validate">
-            <label for="password">Plain text</label>
+            <input type="text" id="plain_text" placeholder="Text to encrypt/decrypt" class="validate">
+            <label for="password">Text (Plain/Cipher)</label>
         </div>
     </div>
     <div class="row">
@@ -78,12 +78,15 @@
             <button class="btn waves-effect waves-light green" type="button" name="action" id="encryptText">Encrypt
                 <i class="material-icons right">send</i>
             </button>
+            <button class="btn waves-effect waves-light green" type="button" name="action" id="decryptText">Decrypt
+                <i class="material-icons right">send</i>
+            </button>
         </div>
     </div>
 
-    <div class="row hide">
+    <div class="row">
         <div class="col s12">
-            <code class="encryptedText"></code>
+            <code class="cipher-text" id="cipher_text"></code>
             <button type="button" class="btn-flat copy" type="submit" onclick="copyToClipboard()" title="Copy to clipboard">
                 <i class="material-icons right">content_copy</i>
             </button>        
@@ -109,10 +112,13 @@
     let generateAesKeyButton = document.getElementById('generateAesKey');
     let regenerateAesKeyButton = document.getElementById('regenerateAesKey');
     let encryptTextButton = document.getElementById('encryptText');
+    let decryptTextButton = document.getElementById('decryptText');
     let textToEncryptField = document.getElementById('plain_text');
+    let cipherText = document.getElementById('cipher_text');
+    
 
     function copyToClipboard() {
-        navigator.clipboard.writeText(document.querySelector('code.uuid').textContent);
+        navigator.clipboard.writeText(document.querySelector('code.cipher-text').textContent);
     }
 
     async function callGenerateAesApi(e) {
@@ -136,6 +142,7 @@
 
             const json = await response.json();
             console.log(json);
+
         });
     }
 
@@ -150,6 +157,20 @@
 
             const json = await response.json();
             console.log(json);
+            cipherText.innerHTML = JSON.stringify(json);
+        });
+    }
+
+    async function callDecryptTextApi(e) {
+        let data = {
+            'content': textToEncryptField.value
+        }
+        await allApi(`/aes-tool/api/decrypt-text`, JSON.stringify(data)).then(async (response) => {
+            if (!response.ok) {
+                throw new Error(`Response status: ${response.status}`);
+            }
+
+            cipherText.innerHTML = await response.text();
         });
     }
 
@@ -181,6 +202,7 @@
         if (generateAesKeyButton) generateAesKeyButton.addEventListener('click', callGenerateAesApi);
         if (regenerateAesKeyButton) regenerateAesKeyButton.addEventListener('click', callRegenerateAesApi);
         if (encryptTextButton) encryptTextButton.addEventListener('click', callEncryptTextApi);
+        if (decryptTextButton) decryptTextButton.addEventListener('click', callDecryptTextApi);
         
     });
 </script>

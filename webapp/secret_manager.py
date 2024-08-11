@@ -69,14 +69,15 @@ SELECT id, title, content FROM user_secret WHERE title = ? AND user_id = ? AND i
         return record
     
     def add_if_not_exists(self, secret_title, secret_content, user_id, is_sysgen = 0):
+        self.log.info('add_if_not_exists called')
         db = get_db()
         db.execute("""
 INSERT INTO user_secret (title, content, user_id, is_sysgen)
 SELECT ? title, ? content, ? user_id, ? is_sysgen 
-FROM user_secret 
-WHERE NOT EXISTS (SELECT 1 FROM user_secret WHERE title = ? AND is_sysgen = ?)
+WHERE NOT EXISTS (SELECT 1 FROM user_secret WHERE title = ? AND user_id = ? AND is_sysgen = ?)
 """,
-            (secret_title, secret_content, user_id, is_sysgen, secret_title, is_sysgen)
+            (secret_title, secret_content, user_id, is_sysgen, 
+             secret_title, user_id, is_sysgen)
         )
         db.commit()
 

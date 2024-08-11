@@ -83,9 +83,6 @@ def register():
         #role_description = request.form['role_description']
         error = None
 
-        import pdb
-        pdb.set_trace()
-
         if not sprint_title:
             error = 'Sprint title is required.'
 
