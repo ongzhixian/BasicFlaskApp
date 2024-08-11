@@ -6,3 +6,4 @@ Markdown==3.6
 selenium==4.23.1
 behave==1.2.6
 requests==2.32.3
+pycryptodome==3.20.0

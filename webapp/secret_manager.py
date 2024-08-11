@@ -31,17 +31,17 @@ LIMIT ? OFFSET ?;
         total_record_count = db.execute("""SELECT COUNT(id) count FROM user_secret;""").fetchone()['count']
         return (records, total_record_count)
         
-    def get_record(self, id):
+    def get_record(self, id, is_sysgen = 0):
         db = get_db()
         record = db.execute("""
 SELECT id, title, content FROM user_secret WHERE id = ?;
 """, (id,)).fetchone()
         return record
 
-    def add_new_record(self, secret_title, secret_content, user_id):
+    def add_new_record(self, secret_title, secret_content, user_id, is_sysgen = 0):
         db = get_db()
-        db.execute('INSERT INTO user_secret (title, content, user_id) VALUES (?, ?, ?);',
-            (secret_title, secret_content, user_id)
+        db.execute('INSERT INTO user_secret (title, content, user_id, is_sysgen) VALUES (?, ?, ?, ?);',
+            (secret_title, secret_content, user_id, is_sysgen)
         )
         db.commit()
 
@@ -58,6 +58,42 @@ SELECT id, title, content FROM user_secret WHERE id = ?;
             (id,)
         )
         db.commit()
+
+    # Enhance
+
+    def find_record(self, title, user_id, is_sysgen = 0):
+        db = get_db()
+        record = db.execute("""
+SELECT id, title, content FROM user_secret WHERE title = ? AND user_id = ? AND is_sysgen = ?;
+""", (title, user_id, is_sysgen)).fetchone()
+        return record
+    
+    def add_if_not_exists(self, secret_title, secret_content, user_id, is_sysgen = 0):
+        db = get_db()
+        db.execute("""
+INSERT INTO user_secret (title, content, user_id, is_sysgen)
+SELECT ? title, ? content, ? user_id, ? is_sysgen 
+FROM user_secret 
+WHERE NOT EXISTS (SELECT 1 FROM user_secret WHERE title = ? AND is_sysgen = ?)
+""",
+            (secret_title, secret_content, user_id, is_sysgen, secret_title, is_sysgen)
+        )
+        db.commit()
+
+    def update_system_record(self, secret_title, secret_content, user_id):
+        db = get_db()
+        db.execute('UPDATE user_secret SET content = ?, update_ts = CURRENT_TIMESTAMP WHERE title = ? AND user_id = ? AND is_sysgen = 1 ;',
+            (secret_content, secret_title, user_id)
+        )
+        db.commit()
+
+    def get_system_record(self, title, user_id):
+        db = get_db()
+        record = db.execute("""
+SELECT id, title, content FROM user_secret WHERE title = ? AND user_id = ? AND is_sysgen = 1;
+""", (title, user_id)).fetchone()
+        return record
+
 
 ##############################
 # ROUTES

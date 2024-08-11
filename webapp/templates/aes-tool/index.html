@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+
+{% block title %}AES Tool{% endblock %}
+
+{% block head %}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+    <style>
+        h1.page-title {
+            font-family: "Anton", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+        span.card-title {
+            font-family: "Anton", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+        div.card-content,div.card-action {
+            font-family: "Source Sans 3", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-style: normal;
+            font-size: medium;
+        }
+        div.card-content {
+            min-height: 10.5em;
+            max-height: 10.5em;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #4CAF50 #546e7a;
+        }
+        code.uuid {
+            background-color: green;
+            color: white;
+            padding: .67em;
+            border-radius: .6em;
+        }
+        button.copy {
+            padding: 0;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col s12">
+            <h1 class="page-title">AES Tool</h1>
+            
+            <p>Encrypt/Decrypt content use AES</p>
+
+            {% if not has_default_aes_key %}
+            <button class="btn-flat waves-effect waves-light green white-text" type="submit" name="action" value="Generate" id="generateAesKey">Generate default AES key
+                <i class="material-icons right">add</i>
+            </button>
+            {% else %}
+            <button class="btn-flat waves-effect waves-light green white-text" type="submit" name="action" value="Regenerate" id="regenerateAesKey">Regenerate default AES key
+                <i class="material-icons right">refresh</i>
+            </button>
+            {% endif %}
+
+        </div>
+    </div>
+    
+    <p>TODO: we should only display the following if we have a default aes key</p>
+
+    <div class="row">
+        <div class="input-field col s12">
+            <input type="text" id="plain_text" placeholder="Text to encrypt" class="validate">
+            <label for="password">Plain text</label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col s12">
+            <button class="btn waves-effect waves-light green" type="button" name="action" id="encryptText">Encrypt
+                <i class="material-icons right">send</i>
+            </button>
+        </div>
+    </div>
+
+    <div class="row hide">
+        <div class="col s12">
+            <code class="encryptedText"></code>
+            <button type="button" class="btn-flat copy" type="submit" onclick="copyToClipboard()" title="Copy to clipboard">
+                <i class="material-icons right">content_copy</i>
+            </button>        
+        </div>
+    </div>
+
+    <!--
+    <div class="row">
+        <p>display cards for each FD here</p>
+    </div>
+    -->
+    
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+<script type="text/javascript">
+    'use strict';
+
+    let generateAesKeyButton = document.getElementById('generateAesKey');
+    let regenerateAesKeyButton = document.getElementById('regenerateAesKey');
+    let encryptTextButton = document.getElementById('encryptText');
+    let textToEncryptField = document.getElementById('plain_text');
+
+    function copyToClipboard() {
+        navigator.clipboard.writeText(document.querySelector('code.uuid').textContent);
+    }
+
+    async function callGenerateAesApi(e) {
+        await allApi(`/aes-tool/api/generate`).then(async (response) => {
+            
+            if (!response.ok) {
+                throw new Error(`Response status: ${response.status}`);
+            }
+
+            const json = await response.json();
+            console.log(json);
+        });
+    }
+
+    async function callRegenerateAesApi(e) {
+        await allApi(`/aes-tool/api/regenerate`).then(async (response) => {
+            
+            if (!response.ok) {
+                throw new Error(`Response status: ${response.status}`);
+            }
+
+            const json = await response.json();
+            console.log(json);
+        });
+    }
+
+    async function callEncryptTextApi(e) {
+        let data = {
+            'content': textToEncryptField.value
+        }
+        await allApi(`/aes-tool/api/encrypt-text`, JSON.stringify(data)).then(async (response) => {
+            if (!response.ok) {
+                throw new Error(`Response status: ${response.status}`);
+            }
+
+            const json = await response.json();
+            console.log(json);
+        });
+    }
+
+    async function allApi(targetUrl, json_content) {
+        const requestHeaders = new Headers();
+        requestHeaders.append("Content-Type", "application/json");
+
+        const response = await fetch(targetUrl, {
+            method: "POST",
+            headers: requestHeaders,
+            body: json_content
+            // body: JSON.stringify({ username: "example" }),
+        });
+
+        return response;
+
+        // if (!response.ok) {
+        //     throw new Error(`Response status: ${response.status}`);
+        // }
+
+        // const json = await response.json();
+        // console.log(json);
+    }
+
+    
+
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOMContentLoaded called');
+        if (generateAesKeyButton) generateAesKeyButton.addEventListener('click', callGenerateAesApi);
+        if (regenerateAesKeyButton) regenerateAesKeyButton.addEventListener('click', callRegenerateAesApi);
+        if (encryptTextButton) encryptTextButton.addEventListener('click', callEncryptTextApi);
+        
+    });
+</script>
+{% endblock %}

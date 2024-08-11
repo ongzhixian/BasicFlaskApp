@@ -173,5 +173,6 @@ CREATE TABLE IF NOT EXISTS user_secret (
     content TEXT NOT NULL,
     user_id INTEGER NOT NULL,
     update_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    is_sysgen INTEGER DEFAULT 0,
     FOREIGN KEY (user_id) REFERENCES user (id)
 );
