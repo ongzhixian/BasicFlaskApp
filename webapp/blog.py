@@ -1,7 +1,7 @@
 from logging import getLogger
 
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, url_for
+    Blueprint, flash, g, redirect, render_template, request, url_for, current_app
 )
 from werkzeug.exceptions import abort
 
@@ -9,6 +9,7 @@ from webapp.auth import login_required
 from webapp.db import get_db
 
 import markdown
+from webapp import StructuredMessage
 
 bp = Blueprint('blog', __name__, url_prefix='/blog')
 
@@ -19,6 +20,7 @@ class BlogRepository:
     """Database repository for blog posts"""
     page_size = 5
     log = getLogger(__name__)
+    
 
     def get_user_blog_posts(self, user_id, page_number = 1):
         offset = (page_number - 1) * self.page_size
@@ -73,11 +75,32 @@ SELECT p.id, p.update_ts, p.content, p.user_id FROM blog_post p WHERE p.user_id 
 
 blog_repository = BlogRepository()
 
+class Point:
+    """ The class represents a point in two-dimensional space """
+
+    def __init__(self, x: float, y: float):
+        # These attributes are public because any value is acceptable for x and y
+        self.x = x
+        self.y = y
 
 @bp.route('/')
 @bp.route('/<int:page_number>')
 @login_required
 def index(page_number=1):
+    # current_app.logger.info('%s YAHOOOOOO', 'TEST PARMS')
+    current_app.logger.info(StructuredMessage('Log message using StructuredMessage', a=1, b=2))
+    current_app.logger.info(                  'Log message using standard python %(va1)s  %(va2)s', { 'va1':1, 'va2':2 })
+    #current_app.logger.info("User %(user)s has logged in from %(location)s", user='Alice', location='Singapore')
+    # user = 'Alice'
+    # ip = '192.168.1.1'
+    # current_app.logger.info(f'XXXUser logged in:aa user={user}, ip={ip}')
+    # current_app.logger.info('va-style Message with coordinates: User {va1}  {va2}', { 'va1':1, 'va2':2})
+
+    # p = Point()
+    # p.x = 0.5
+    # p.y = 0.5
+    # current_app.logger.info('Message with coordinates: ({point.x:.2f}, {point.y:.2f})', point=p)
+
     (posts, total_record_count) = blog_repository.get_user_blog_posts(g.user['id'], page_number)
     # htmlContent = markdown.markdown(note['content'])
     # p.id, p.update_ts, p.content, p.user_id, u.username
