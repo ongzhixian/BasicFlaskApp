@@ -71,8 +71,10 @@ def index(page_number=1):
 @login_required
 def view(id=1):
     note = note_repository.get_user_note(g.user['id'], id)
-    
-    htmlContent = markdown.markdown(note['content'])
+    raw_markdown = f"""# {note['title']}
+{note['content']}
+"""
+    htmlContent = markdown.markdown(raw_markdown)
     return render_template('notes/view.html', note=note, content=htmlContent)
 
 @bp.route('/create', methods=('GET', 'POST'))
