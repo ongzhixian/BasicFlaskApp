@@ -24,7 +24,7 @@ class UserSecretRepository:
         db = get_db()
         records = db.execute("""
 SELECT id, title, content, update_ts FROM user_secret 
-WHERE user_id = ?
+WHERE user_id = ? AND is_sysgen = 0
 ORDER BY title ASC
 LIMIT ? OFFSET ?;
 """, (user_id, self.page_size, offset)).fetchall()
@@ -34,8 +34,8 @@ LIMIT ? OFFSET ?;
     def get_record(self, id, is_sysgen = 0):
         db = get_db()
         record = db.execute("""
-SELECT id, title, content FROM user_secret WHERE id = ?;
-""", (id,)).fetchone()
+SELECT id, title, content FROM user_secret WHERE id = ? AND is_sysgen = ?;
+""", (id,is_sysgen)).fetchone()
         return record
 
     def add_new_record(self, secret_title, secret_content, user_id, is_sysgen = 0):
@@ -45,17 +45,17 @@ SELECT id, title, content FROM user_secret WHERE id = ?;
         )
         db.commit()
 
-    def update_record(self, id, secret_title, secret_content):
+    def update_record(self, id, secret_content, is_sysgen = 0):
         db = get_db()
-        db.execute('UPDATE user_secret SET title = ?, content = ? WHERE id = ?;',
-            (secret_title, secret_content, id)
+        db.execute('UPDATE user_secret SET content = ?, update_ts = CURRENT_TIMESTAMP WHERE id = ? AND is_sysgen = ?;',
+            (secret_content, id, is_sysgen)
         )
         db.commit()
 
-    def delete_record(self, id):
+    def delete_record(self, id, is_sysgen = 0):
         db = get_db()
-        db.execute('DELETE FROM user_secret WHERE id = ?;',
-            (id,)
+        db.execute('DELETE FROM user_secret WHERE id = ? AND is_sysgen = ?;',
+            (id,is_sysgen)
         )
         db.commit()
 
@@ -151,7 +151,7 @@ def edit(id):
             if action == 'Delete':
                 user_secret_repository.delete_record(id)
             else:
-                user_secret_repository.update_record(id, secret_title, secret_content)
+                user_secret_repository.update_record(id, secret_content)
             return redirect(url_for('secret-manager.index'))
     record = user_secret_repository.get_record(id)
     return render_template('secret-manager/edit.html', record=record)
