@@ -176,3 +176,17 @@ CREATE TABLE IF NOT EXISTS user_secret (
     is_sysgen INTEGER DEFAULT 0,
     FOREIGN KEY (user_id) REFERENCES user (id)
 );
+
+
+CREATE TABLE IF NOT EXISTS user_profile (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    first_name TEXT NOT NULL,
+    last_name TEXT NOT NULL,
+    user_id INTEGER NOT NULL,
+    created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    update_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE("user_id"),
+    FOREIGN KEY("user_id") REFERENCES "user"("id")
+);
+
+

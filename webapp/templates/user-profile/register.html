@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Register{% endblock %}
+
+{% block head %}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet" />
+    <style>
+        h1.page-title {
+            font-family: "Bebas Neue", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+        table.content th {
+            font-family: "Source Sans 3", sans-serif;
+            font-weight: 700;
+            font-style: normal;
+        }
+        table.content td {
+            font-family: "Source Sans 3", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-style: normal;
+            font-size: medium;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top:1em;">
+    
+    <div class="row">
+        <div class="col s12">
+            <h1 class="page-title blue-grey-text">Register new project</h1>    
+        </div>
+    </div>
+     
+    <form method="post">
+        
+        <div class="row">
+            <div class="input-field col s6">
+                <input placeholder="Project title" id="project_title" name="project_title" type="text" class="validate" />
+                <label for="project_title">Project title</label>
+            </div>
+        </div>
+        
+        <!--
+        <div class="row">
+            <div class="input-field col s6">
+                <textarea id="role_description" name="role_description" class="materialize-textarea"></textarea>
+                <label for="role_description">Role description</label>
+            </div>
+        </div>
+        -->
+        
+        <!-- ACTION ROW -->
+
+        <div class="row">
+            <div class="col s6">
+                <button class="btn-flat waves-effect waves-light green white-text" type="submit" name="action" value="Register">Register
+                  <i class="material-icons right">save</i>
+                </button>
+            </div>
+        </div>
+
+    </form>
+
+
+    <div class="row">
+        <div class="col s6">
+        {% for message in get_flashed_messages() %}
+          <div class="flash">{{ message }}</div>
+        {% endfor %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}
