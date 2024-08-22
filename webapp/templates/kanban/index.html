@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+{% from "_macros/_pagination.html" import pager with context %}
+
+{% block title %}Kanban{% endblock %}
+
+{% block head %}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet" />
+    <style>
+        h1.page-title {
+            font-family: "Bebas Neue", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+        table.content th {
+            font-family: "Source Sans 3", sans-serif;
+            font-weight: 700;
+            font-style: normal;
+        }
+        table.content td {
+            font-family: "Source Sans 3", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-style: normal;
+            font-size: medium;
+        }
+        .action-column {
+            width: 5em;
+        }
+
+        .kanban.grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: 3.67em 1fr;
+            column-gap: 1em;
+            row-gap: .67em;
+            margin: 1em;
+        }
+
+        .kanban.grid h1 {
+            font-size: 2em;
+            font-weight: 700;
+            text-align: center;
+            margin: .36em 0;
+        }
+
+        .kanban.grid .lane.header {
+            /* background-color:green; */
+        }
+
+        .kanban.grid .lane.body {
+            /* background-color: aqua; */
+            border-style: dashed;
+            border-color: aquamarine;
+            padding: .5em .5em 3em;
+        }
+
+        /* .kanban h1 {
+            font-size: 16pt;
+            font-weight: 700;
+        }
+        .kanban .col {
+            background-color: aqua;
+        } */
+
+        .card {
+            min-height: 234px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+<div>
+    <h1 class="page-title">
+        Program increment 1 - Iteration 2
+        <small>
+            (2024-08-01 to 2024-08-15)
+        </small>
+    </h1>
+    
+</div>
+
+<div class="kanban grid">
+
+    <div class="lane header">
+        <h1 class="green-text">Tasks</h1>
+    </div>
+    <div class="lane header green">
+        <h1 class="white-text">Todo</h1>
+    </div>
+    <div class="lane header green">
+        <h1 class="white-text">Progress</h1>
+    </div>
+    <div class="lane header green">
+        <h1 class="white-text">Testing</h1>
+    </div>
+    <div class="lane header green">
+        <h1 class="white-text">Done</h1>
+    </div>
+
+    <div class="lane body">
+
+        <div class="card blue-grey darken-1" draggable="true" id="card1">
+            <div class="card-content white-text">
+              <span class="card-title">Task One</span>
+              <p>I am a very simple card. I am good at containing small bits of information.
+              I am convenient because I require little markup to use effectively.</p>
+            </div>
+            <div class="card-action">
+              <a href="#">This is a link</a>
+              <a href="#">This is a link</a>
+            </div>
+        </div>
+
+        <div class="card blue-grey darken-1" draggable="true" id="card2">
+            <div class="card-content white-text">
+              <span class="card-title">Task Two</span>
+              <p>I am a very simple card. I am good at containing small bits of information.
+              I am convenient because I require little markup to use effectively.</p>
+            </div>
+            <div class="card-action">
+              <a href="#">This is a link</a>
+              <a href="#">This is a link</a>
+            </div>
+        </div>
+
+        <div class="card blue-grey darken-1" draggable="true" id="card3">
+            <div class="card-content white-text">
+              <span class="card-title">Task Three</span>
+              <p>I am a very simple card. I am good at containing small bits of information.
+              I am convenient because I require little markup to use effectively.</p>
+            </div>
+            <div class="card-action">
+              <a href="#">This is a link</a>
+              <a href="#">This is a link</a>
+            </div>
+        </div>
+
+        <div class="card blue-grey darken-1" draggable="true" id="card4">
+            <div class="card-content white-text">
+              <span class="card-title">Task Four</span>
+              <p>I am a very simple card. I am good at containing small bits of information.
+              I am convenient because I require little markup to use effectively.</p>
+            </div>
+            <div class="card-action">
+              <a href="#">This is a link</a>
+              <a href="#">This is a link</a>
+            </div>
+        </div>
+    </div>
+    <div class="lane body droppable">
+        
+    </div>
+    <div class="lane body droppable">
+        
+    </div>
+    <div class="lane body droppable">
+        
+    </div>
+    <div class="lane body droppable">
+        
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script type="text/javascript">
+    'use strict';
+    const domParser = new DOMParser();
+
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOMContentLoaded called');
+
+        // Add dragstart event to draggable items
+        let cardElements = document.querySelectorAll(".card");
+        console.debug("Card elements count", cardElements.length);
+        cardElements.forEach(function(cardElement, idx, nodeList) {
+            cardElement.addEventListener("dragstart", function(ev) {
+                // ev.dataTransfer.setData("application/x-moz-node", ev.target);
+                ev.dataTransfer.setData("text/plain", ev.target.id);
+                ev.dataTransfer.effectAllowed = "move";
+            });
+        });
+        
+        let droppableLaneElements = document.querySelectorAll(".lane.droppable");
+        console.debug("droppableLaneElements count", droppableLaneElements.length);
+        droppableLaneElements.forEach(function(laneElement, idx, nodeList) {
+            laneElement.addEventListener("dragover", function(ev) {
+                ev.preventDefault();
+            });
+
+            laneElement.addEventListener("drop", function(ev) {
+                
+                ev.preventDefault();
+                if (!ev.target.classList.contains('droppable')) return;
+
+                // let html = ev.dataTransfer.getData("application/x-moz-node");
+                // console.debug(html)
+                // const doc1 = domParser.parseFromString(html, "text/html");
+                // debugger;
+                // ev.target.appendChild(html);
+                const data = ev.dataTransfer.getData("text");
+                ev.target.appendChild(document.getElementById(data));
+                
+                //el.appendChild(document.getElementById(data));
+
+            });
+        });
+
+        // cardElements.addEventListener("dragstart", function(ev) {
+        //     debugger;
+        //     ev.dataTransfer.setData("text", ev.target.id);
+        // });
+
+        // if (generateAesKeyButton) generateAesKeyButton.addEventListener('click', callGenerateAesApi);
+        // if (regenerateAesKeyButton) regenerateAesKeyButton.addEventListener('click', callRegenerateAesApi);
+        // if (encryptTextButton) encryptTextButton.addEventListener('click', callEncryptTextApi);
+        // if (decryptTextButton) decryptTextButton.addEventListener('click', callDecryptTextApi);
+    });
+
+</script>
+{% endblock %}
