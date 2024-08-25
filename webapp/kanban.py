@@ -19,6 +19,40 @@ class KanbanRepository:
     page_size = 10
     log = getLogger(__name__)
 
+    def get_kanban_lanes(self, board_title, user_id):
+        db = get_db()
+        records = db.execute("""
+SELECT 	kb.title as 'board_title'
+		, kb.description as 'board_description' 
+        , kl.id as 'lane_id'
+		, kl.display_order as 'lane_order'
+		, kl.title as 'lane_title'
+		, kl.description as 'lane_description'
+FROM 	kanban_board kb
+LEFT JOIN 	kanban_lane kl
+		ON kb.id = kl.kanban_board_id
+WHERE 	kb.user_id = ? AND kb.title = ?
+ORDER BY kl.display_order
+""", (user_id, board_title)).fetchall()
+        return records
+
+    def get_kanban_lane_items(self, kanban_lane_id):
+        db = get_db()
+        records = db.execute("""
+SELECT 	ki.kanban_lane_id as 'lane_id'
+		, ki.id as 'item_id'
+		, ki.display_order as 'item_order'
+		, ki.title as 'item_title'
+		, ki.description as 'item_description'
+FROM 	kanban_lane kl
+LEFT JOIN	kanban_item ki
+		ON kl.id = ki.kanban_lane_id
+WHERE 	kl.id = ?
+ORDER BY kl.display_order, ki.display_order
+
+""", (kanban_lane_id,)).fetchall()
+        return records
+
     def get_paged_records(self,page_number):
         offset = (page_number - 1) * self.page_size
         db = get_db()
@@ -71,12 +105,83 @@ SET first_name = ?
 # ROUTES
 
 kanban_repository = KanbanRepository()
+from webapp.tasks import TaskRepository
+task_repository = TaskRepository()
 
 @bp.route('/')
 def index():
     #(records, total_record_count) = kanban_repository.get_paged_records(page_number)
     # record = kanban_repository.get_record_by_user_id(g.user['id'])
     return render_template('kanban/index.html')
+
+
+@bp.route('/api/lanes', methods=['GET', 'POST'])
+def api_get_lanes():
+    lane_records = kanban_repository.get_kanban_lanes('Tasks', g.user['id'])
+    response = {
+        'records': [dict(record) for record in lane_records]
+    }
+    return json.dumps(response)
+
+@bp.route('/api/items', methods=['GET', 'POST'])
+def api_get_items():
+    if 'id' not in request.args:
+        abort(400)
+    lane_id = request.args['id']
+    lane_records = kanban_repository.get_kanban_lane_items(lane_id)
+    response = {
+        'records': [dict(record) for record in lane_records]
+    }
+    return json.dumps(response)
+
+
+@bp.route('/api/tasks', methods=['GET', 'POST'])
+def api_get_tasks():
+    #task_records = task_repository.get_tasks_by_user_id(g.user['id'])
+    #(records, total_record_count) = kanban_repository.get_paged_records(page_number)
+    # record = kanban_repository.get_record_by_user_id(g.user['id'])
+    if request.method == 'POST':
+        # import pdb
+        # pdb.set_trace()
+        if not request.is_json:
+            abort(400)
+
+        if request.is_json:
+            task_title = request.json['task_title']
+            task_description = request.json['task_description']
+
+        #project_title = request.form['project_title']
+        #role_description = request.form['role_description']
+        error = None
+
+        if not task_title:
+            error = 'Task title is required.'
+
+        if error is not None:
+            abort(400)
+        else:
+            task_repository.add_new_record(task_title, task_description, g.user['id'])
+            return '{}'
+            #return redirect(url_for('projects.index'))
+
+    #(records, total_record_count) = issue_repository.search(f"%{query}%", page)
+    task_records = task_repository.get_tasks_by_user_id(g.user['id'])
+    response = {
+        # 'total_record_count': total_record_count,
+        'records': [dict(record) for record in task_records]
+    }
+    return json.dumps(response)
+    #return render_template('kanban/index.html', task_records=task_records)
+    
+
+@bp.route('/api/add-task', methods=['POST'])
+def api_add_task():
+    #(records, total_record_count) = kanban_repository.get_paged_records(page_number)
+    # record = kanban_repository.get_record_by_user_id(g.user['id'])
+    #task_records = task_repository.add_task(g.user['id'])
+    #return render_template('kanban/index.html', task_records=task_records)
+    pass
+
 
 
 @bp.route('/register', methods=('GET', 'POST'))

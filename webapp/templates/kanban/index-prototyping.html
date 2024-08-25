@@ -116,7 +116,6 @@
 
 {% block content %}
 
-
 <div class="kanban grid">
 
     <div class="lane header">
@@ -129,8 +128,10 @@
         </h1>
     </div>
 
+    
+
     <div class="lane header green">
-        <h1 class="white-text">In Progress</h1>
+        <h1 class="white-text">In progress</h1>
     </div>
     <div class="lane header green">
         <h1 class="white-text">Testing</h1>
@@ -143,15 +144,75 @@
         <!-- <h1 class="white-text">Todo</h1> -->
     </div>
     
+
     <!-- lane bodies -->
 
-    <div class="lane body droppable"></div>
-    <div class="lane body droppable"></div>
-    <div class="lane body droppable"></div>
-    <div class="lane body droppable"></div>
+    <div class="lane body droppable task">
 
-    <div class=" body">
-        <!-- <div>Info about selected card (if any)</div> -->
+        <div class="card blue-grey darken-1" draggable="true" id="cardx1">
+            <div class="card-content white-text">
+              <span class="card-title">Task One</span>
+              <p>I am a very simple card. I am good at containing small bits of information.
+              I am convenient because I require little markup to use effectively.</p>
+            </div>
+            <div class="card-action">
+              <a href="#">This is a link</a>
+              <a href="#">This is a link</a>
+            </div>
+        </div>
+
+        <div class="card blue-grey darken-1" draggable="true" id="cardx2">
+            <div class="card-content white-text">
+              <span class="card-title">Task Two</span>
+              <p>I am a very simple card. I am good at containing small bits of information.
+              I am convenient because I require little markup to use effectively.</p>
+            </div>
+            <div class="card-action">
+              <a href="#">This is a link</a>
+              <a href="#">This is a link</a>
+            </div>
+        </div>
+
+        <div class="card blue-grey darken-1" draggable="true" id="cardx3">
+            <div class="card-content white-text">
+              <span class="card-title">Task Three</span>
+              <p>I am a very simple card. I am good at containing small bits of information.
+              I am convenient because I require little markup to use effectively.</p>
+            </div>
+            <div class="card-action">
+              <a href="#">This is a link</a>
+              <a href="#">This is a link</a>
+            </div>
+        </div>
+
+        <div class="card blue-grey darken-1" draggable="true" id="cardx4">
+            <div class="card-content white-text">
+              <span class="card-title">Task Four</span>
+              <p>I am a very simple card. I am good at containing small bits of information.
+              I am convenient because I require little markup to use effectively.</p>
+            </div>
+            <div class="card-action">
+              <a href="#">This is a link</a>
+              <a href="#">This is a link</a>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="lane body droppable">
+        
+    </div>
+    <div class="lane body droppable">
+        
+    </div>
+    <div class="lane body droppable">
+        
+    </div>
+
+    <div class="lane body">
+        <div>Info about selected card (if any)</div>
+
     </div>
 </div>
 
@@ -241,48 +302,9 @@
         }
     }
 
-    function KanbanApi() {
-        this.getLanes = async function() {
-            const url = "/kanban/api/lanes";
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`Response status: ${response.status}`);
-                }
-
-                const json = await response.json();
-                console.log('getLanes result', json);
-                return json.records;
-
-            } catch (error) {
-                console.error(error.message);
-            }
-        }
-
-        this.getItems = async function(lane_id) {
-            const url = `/kanban/api/items?id=${lane_id}`;
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`Response status: ${response.status}`);
-                }
-
-                const json = await response.json();
-                console.log('getItems result', json);
-                return json.records;
-                
-            } catch (error) {
-                console.error(error.message);
-            }
-        }
-    }
-
     function KanbanBoard() {
         this.cardCounter = 1;
         this.self = this;
-        this.lanes = {};
-        const headerElementPrefix = 'itemHeader';
-        const itemElementPrefix = 'itemLane';
 
         this.makeCard = function(task_title, task_description, task_id) {
 
@@ -321,47 +343,8 @@
 
         this.loadTasks = async function() {
             console.log('Load tasks');
-            // let task_list = await taskApi.getTasks();
-            // this.update_task_lane(task_list);
-
-            let lane_records = await kanbanApi.getLanes();
-            await this.updateLaneHeaders(lane_records);
-            this.updateDisplay();
-        }
-
-        this.updateDisplay = function() {
-            console.log('update display');
-            debugger;
-            Object.keys(this.lanes).forEach(function(laneKey) {
-                debugger;
-                let lane = this.lanes[laneKey];
-                console.log('update display');
-                debugger;
-                lane.items.forEach(function (item, idy, arr2) {
-                    debugger;
-                    let targetLaneId = `${itemElementPrefix}${item['lane_id']}`;
-                });
-            }, this);
-
-            // this.lanes.forEach(function(lane, idx, arr) {
-            //     lane.items.forEach(function (item, idy, arr2) {
-            //         debugger;
-            //         let targetLaneId = `${itemElementPrefix}${item['lane_id']}`;
-            //     });
-            // });
-        }
-
-        this.updateLaneHeaders = function (records) {
-            let laneHeaders = document.querySelectorAll('.kanban.grid .lane.header');
-            let laneBodies = document.querySelectorAll('.kanban.grid .lane.body');
-            records.forEach(async function (rec, idx, arr) {
-                this[rec.lane_title] = {
-                    record : rec,
-                    items: await kanbanApi.getItems(rec['lane_id'])
-                }
-                laneHeaders[idx].id = `${headerElementPrefix}${rec['lane_id']}`;
-                laneBodies[idx].id = `${itemElementPrefix}${rec['lane_id']}`;
-            }, this.lanes);
+            let task_list = await taskApi.getTasks();
+            this.update_task_lane(task_list);
         }
 
         this.update_task_lane = function(task_list) {
@@ -376,7 +359,6 @@
     }
 
     const taskApi = new TaskApi();
-    const kanbanApi = new KanbanApi();
     const kanbanBoard = new KanbanBoard();
 
     const addTaskDialog = document.getElementById('addTaskDialog');

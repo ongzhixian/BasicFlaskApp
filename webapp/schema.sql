@@ -191,13 +191,78 @@ CREATE TABLE IF NOT EXISTS user_profile (
 
 
 
-CREATE TABLE IF NOT EXISTS kanban (
+
+
+CREATE TABLE IF NOT EXISTS task (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    issue_id INTEGER NULL,
+
+    create_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    update_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    
+    title TEXT NOT NULL,
+    description TEXT NULL,
+    status TEXT NOT NULL,
+    priority INT NOT NULL DEFAULT 0,
+    
+    FOREIGN KEY (user_id) REFERENCES user (id),
+    FOREIGN KEY (issue_id) REFERENCES issue (id)
+);
+
+
+
+
+CREATE TABLE IF NOT EXISTS kanban_board (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     update_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE("user_id"),
+    title TEXT NOT NULL,
+    description TEXT NULL,
     FOREIGN KEY("user_id") REFERENCES "user"("id")
 );
 
+
+CREATE TABLE IF NOT EXISTS kanban_lane (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    kanban_board_id INTEGER NOT NULL,
+    created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    update_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    title TEXT NOT NULL,
+    description TEXT NULL,
+	display_order INTEGER DEFAULT 0,
+    FOREIGN KEY("kanban_board_id") REFERENCES "kanban_board"("id")
+);
+
+CREATE TABLE IF NOT EXISTS kanban_item (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    kanban_lane_id INTEGER NOT NULL,
+    created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    update_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    title TEXT NOT NULL,
+    description TEXT NULL,
+	display_order INTEGER DEFAULT 0,
+    FOREIGN KEY("kanban_lane_id") REFERENCES "kanban_lane"("id")
+);
+
+
+insert into kanban_board (user_id, title, description) values (1, 'Tasks', 'My tasks')
+insert into kanban_lane (kanban_board_id, title, description, display_order) VALUES (1, 'Tasks', 'Available tasks', 1);
+insert into kanban_lane (kanban_board_id, title, description, display_order) VALUES (1, 'In Progress', 'Tasks in progress', 2);
+insert into kanban_lane (kanban_board_id, title, description, display_order) VALUES (1, 'Testing', 'Completion verification', 3);
+insert into kanban_lane (kanban_board_id, title, description, display_order) VALUES (1, 'Done', 'Completed tasks', 4);
+
+insert into kanban_item (kanban_lane_id, title, description, display_order) VALUES 
+    (1, 'Task One',  '<p>I am a very simple card. I am good at containing small bits of information.I am convenient because I require little markup to use effectively.</p>', 1);
+insert into kanban_item (kanban_lane_id, title, description, display_order) VALUES 
+    (1, 'Task Two',  '<p>I am a very simple card. I am good at containing small bits of information.I am convenient because I require little markup to use effectively.</p>', 2);
+insert into kanban_item (kanban_lane_id, title, description, display_order) VALUES 
+    (1, 'Task Three',  '<p>I am a very simple card. I am good at containing small bits of information.I am convenient because I require little markup to use effectively.</p>', 3);
+insert into kanban_item (kanban_lane_id, title, description, display_order) VALUES 
+    (1, 'Task Four',  '<p>I am a very simple card. I am good at containing small bits of information.I am convenient because I require little markup to use effectively.</p>', 4);
+insert into kanban_item (kanban_lane_id, title, description, display_order) VALUES 
+    (1, 'Task Five',  '<p>I am a very simple card. I am good at containing small bits of information.I am convenient because I require little markup to use effectively.</p>', 5);
+insert into kanban_item (kanban_lane_id, title, description, display_order) VALUES 
+    (1, 'Task Six',  '<p>I am a very simple card. I am good at containing small bits of information.I am convenient because I require little markup to use effectively.</p>', 6);
 
