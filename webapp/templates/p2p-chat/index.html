@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+{% from "_macros/_pagination.html" import pager with context %}
+
+{% block title %}P2P Chat{% endblock %}
+
+{% block head %}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet" />
+    <style>
+        h1.page-title {
+            font-family: "Bebas Neue", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+        table.content th {
+            font-family: "Source Sans 3", sans-serif;
+            font-weight: 700;
+            font-style: normal;
+        }
+        table.content td {
+            font-family: "Source Sans 3", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-style: normal;
+            font-size: medium;
+        }
+        #new_message {
+            height: auto;
+        }
+        .action-column {
+            width: 5em;
+        }
+
+        /* .messageHistory {
+            
+            display: grid;
+            grid-template-columns: 50px 50px 1fr;
+        } */
+
+        ul#messages {
+            height: 24em; 
+            background-color: aliceblue;
+            overflow-y: scroll;
+        }
+
+        ul#messages li {
+            display: grid;
+            grid-template-columns: 12.6em 5.6em 1fr;
+            /* background-color: lightpink; */
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        
+        <div class="col s12">
+            <h1 class="page-title blue-grey-text">P2P Chat</h1>    
+        </div>
+    </div>
+
+    <form method="post">
+
+        <div class="row">
+            <div class="input-field col s10">
+                
+                <ul id="messages">
+                    <li>
+                        <span>[2020-02-03 10:28:33]</span>
+                        <span>zhixian</span>
+                        <span>Some message 1</span>
+                    </li>
+                    <li>
+                        <span>[2020-02-03 10:28:33]</span>
+                        <span>zhixian</span>
+                        <span>Some message 1</span>
+                    </li>
+                    <!-- <li>[2020-02-03 10:28:33] Some message</li>
+                    <li>[2020-02-03 10:28:33] Some message</li>
+                    <li>[2020-02-03 10:28:33] Some message</li> -->
+                </ul>
+<!-- 
+                <div id="messageHistory">
+
+                    
+                    <span>[2020-02-03 10:28:33]</span>
+                    <span>zhixian</span>
+                    <span>Some message 1</span>
+                </div>
+                 -->
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="input-field col s10">
+                <textarea id="new_message" name="new_message" class="materialize-textarea" rows="4"></textarea>
+                <label for="new_message">Message</label>
+            </div>
+        </div>
+        
+        <!-- ACTION ROW -->
+
+        <div class="row">
+            <div class="col s6">
+                <button id="saveButton" class="btn-flat waves-effect waves-light green white-text" type="submit" name="action" value="Save">Save
+                    <i class="material-icons right">save</i>
+                </button>
+                
+                <span>Status:</span>
+                
+            </div>
+        </div>
+    
+    </form>
+
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js" integrity="sha512-7SRCYIJtR6F8ocwW7UxW6wGKqbSyqREDbfCORCbGLatU0iugBLwyOXpzhkPyHIFdBO0K2VCu57fvP2Twgx1o2A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.js" integrity="sha512-FzakzcmrNSXS5+DuuYSO6+5DcUZ417Na0vH1oAIo49mMBA8rHSgkKSjE2ALFOxdQ/kPqF3HZRzb0HQ+AvwXttg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script type="text/javascript">
+    'use strict';
+
+    const messageHistoryList = document.getElementById('messages');
+    const saveButton = document.getElementById('saveButton');
+    const newMessage = document.getElementById('new_message');
+    const connection = new signalR.HubConnectionBuilder()
+            .withUrl("https://localhost:5207/chathub")
+            .configureLogging(signalR.LogLevel.Information)
+            .build();
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // var elems = document.querySelectorAll('select');
+        // var instances = M.FormSelect.init(elems, {});
+
+        initializeSignalR();
+
+        // PAGE LEVEL EVENTS
+
+        saveButton.addEventListener('click', sendMessage);
+
+        document.addEventListener("keydown", keyDownHandler);
+
+    });
+
+    async function start() {
+        try {
+            await connection.start();
+            console.log("SignalR Connected.");
+        } catch (err) {
+            console.log(err);
+            setTimeout(start, 5000);
+        }
+    };
+
+    async function initializeSignalR() {
+
+        connection.on("ReceiveMessage", function (user, message) {
+            console.log('ReceiveMessage', user, message);
+
+            // <li>
+            //     <span>[2020-02-03 10:28:33]</span>
+            //     <span>zhixian</span>
+            //     <span>Some message 1</span>
+            // </li>
+            
+
+            let messageItem = document.createElement('li');
+            
+            let timespanSpan = document.createElement('span');
+            timespanSpan.innerHTML =(new Date(message.timestamp)).toISOString();
+            messageItem.appendChild(timespanSpan);
+
+            let userSpan = document.createElement('span');
+            userSpan.innerHTML = message.user;
+            messageItem.appendChild(userSpan);
+
+            let messageSpan = document.createElement('span');
+            messageSpan.innerHTML = message.content;
+            messageItem.appendChild(messageSpan);
+
+            messageHistoryList.appendChild(messageItem);
+            
+            debugger;
+            messageHistoryList.scrollTop = messageHistoryList.scrollHeight;
+
+            //messageHistoryList.
+
+            // var li = document.createElement("li");
+            // document.getElementById("messagesList").appendChild(li);
+            // // We can assign user-supplied strings to an element's textContent because it
+            // // is not interpreted as markup. If you're assigning in any other way, you 
+            // // should be aware of possible script injection concerns.
+            // li.textContent = `${user} says ${message}`;
+        });
+
+        connection.onclose(async () => {
+            await start();
+        });
+
+        await start(); // Start connection.
+    }
+
+    function sendMessage() {
+
+        const user = 'mock';
+        let message = newMessage.value;
+
+        console.log("Do send message " + newMessage.value);
+        connection.invoke("SendMessage", user, message).catch(function (err) {
+            return console.error(err.toString());
+        });
+        newMessage.value = "";
+    }
+
+    function keyDownHandler(e) {
+        console.debug("Key", e.key, "code", e.code, "CTRL", e.ctrlKey, "ALT", e.altKey);
+        if (e.code === "Enter" && e.ctrlKey) {
+            event.preventDefault();
+            //addTaskDialog.showModal();
+            sendMessage();
+        }
+    }
+
+
+</script>
+{% endblock %}
