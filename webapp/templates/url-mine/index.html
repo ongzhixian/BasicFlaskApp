@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% from "_macros/_pagination.html" import pager with context %}
+
+{% block title %}Url mine{% endblock %}
+
+{% block head %}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet" />
+    <style>
+        h1.page-title {
+            font-family: "Bebas Neue", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+        table.content th {
+            font-family: "Source Sans 3", sans-serif;
+            font-weight: 700;
+            font-style: normal;
+        }
+        table.content td {
+            font-family: "Source Sans 3", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-style: normal;
+            font-size: medium;
+        }
+        #url_text {
+            height: auto;
+        }
+        .action-column {
+            width: 5em;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        
+        <div class="col s12">
+            <h1 class="page-title blue-grey-text">Url mine</h1>    
+        </div>
+    </div>
+    
+    <div class="row">
+
+        <form method="post">
+
+            <div class="row">
+                <div class="input-field col s10">
+                    <textarea id="url_text" name="url_text" class="materialize-textarea" rows="16"></textarea>
+                    <label for="url_text">URLs</label>
+                </div>
+            </div>
+            
+            <!-- ACTION ROW -->
+    
+            <div class="row">
+                <div class="col s6">
+                    <button class="btn-flat waves-effect waves-light green white-text" type="submit" name="action" value="Save">Save
+                      <i class="material-icons right">save</i>
+                    </button>
+                </div>
+            </div>
+        
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}
