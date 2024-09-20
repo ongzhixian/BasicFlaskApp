@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% from "algotrade/_charts_nav.html" import charts_nav with context %}
 
 {% block title %}AlgoTrade{% endblock %}
 
@@ -33,13 +34,55 @@
 {% block content %}
 
 <div class="container">
+
+    <br/>
+
     <div class="row">
-        
+        <div class="col s4">
+            <div class="tradable-instruments summary table">
+
+
+            </div>
+            <p>Tradable instruments: <a href="#">3</a></p>
+        </div>
+
+        <div class="col s4">
+            <form method="post">
+                <button id="saveButton" class="btn-flat waves-effect waves-light green white-text" type="submit" name="action" value="Save">Run
+                    <i class="material-icons right">save</i>
+                </button>
+            </form>
+            
+        </div>
+    </div>
+
+    {{ charts_nav() }}
+
+    <div class="row">
+        <a href="{{ url_for('algotrade.trade_oanda') }}" class="waves-effect waves-light green btn">
+            <i class="material-icons right">money</i>Trade (Oanda)
+        </a>
+
+        <a href="{{ url_for('algotrade.trade_oanda') }}" class="waves-effect waves-light green btn"></a>
+            <i class="material-icons right">money</i>Market (Oanda)
+        </a>
+
+    </div>
+    
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+
+    <hr/>
+
+    <div class="row">
         <div class="col s12">
             <h1 class="page-title">Trading news!</h1>    
         </div>
     </div>
-    
+
     <div class="row">
         <div class="col s4">
             <article>

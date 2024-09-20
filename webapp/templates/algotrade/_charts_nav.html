@@ -1,0 +1,33 @@
+{% macro charts_nav() %}
+
+<div class="row">
+
+    <h6>OHLC charts</h6>
+
+    <a href="{{ url_for('algotrade.sample_ohlc_amcharts') }}" class="waves-effect waves-light green btn">
+        <i class="material-icons right">add</i>AmCharts
+    </a>
+
+    <a href="{{ url_for('algotrade.sample_ohlc_anycharts') }}" class="waves-effect waves-light green btn">
+        <i class="material-icons right">add</i>Anycharts
+    </a>
+    
+    <a href="{{ url_for('algotrade.sample_ohlc_chartjs') }}" class="waves-effect waves-light green btn">
+        <i class="material-icons right">add</i>ChartJs
+    </a>
+
+    <a href="{{ url_for('algotrade.sample_ohlc_highcharts') }}" class="waves-effect waves-light green btn">
+        <i class="material-icons right">add</i>Highcharts
+    </a>
+
+    <a href="{{ url_for('algotrade.sample_ohlc_plotly') }}" class="waves-effect waves-light green btn">
+        <i class="material-icons right">add</i>Plotly
+    </a>
+
+    <a href="{{ url_for('algotrade.sample_ohlc_techanjs') }}" class="waves-effect waves-light green btn">
+        <i class="material-icons right">add</i>TechanJs
+    </a>
+
+</div>
+
+{% endmacro %}

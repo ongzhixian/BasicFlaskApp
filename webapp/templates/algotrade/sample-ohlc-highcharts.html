@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% from "algotrade/_charts_nav.html" import charts_nav with context %}
+
+{% block title %}AlgoTrade{% endblock %}
+
+{% block head %}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet" />
+    <style>
+        h1.page-title {
+          font-family: "Playfair Display", serif;
+          font-optical-sizing: auto;
+          font-weight: 700;
+          font-style: normal;
+        }
+        article h1.title {
+          font-family: "Playfair Display", serif;
+          font-optical-sizing: auto;
+          font-weight: 700;
+          font-style: normal;
+          font-size: 2em;
+          margin:0;
+        }
+        article section.body {
+            font-family: "Source Sans 3", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-style: normal;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <h1>OHLC (using Highcharts)</h1>
+
+    <br/>
+
+    <div class="row">
+        <div class="col s4">
+            <form method="post">
+                <button id="saveButton" class="btn-flat waves-effect waves-light green white-text" type="submit" name="action" value="Save">Run
+                    <i class="material-icons right">save</i>
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    {{ charts_nav() }}
+
+
+</div>
+
+{% endblock %}
