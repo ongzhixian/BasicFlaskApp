@@ -266,3 +266,49 @@ insert into kanban_item (kanban_lane_id, title, description, display_order) VALU
 insert into kanban_item (kanban_lane_id, title, description, display_order) VALUES 
     (1, 'Task Six',  '<p>I am a very simple card. I am good at containing small bits of information.I am convenient because I require little markup to use effectively.</p>', 6);
 
+
+-- CREATE TABLE IF NOT EXISTS oanda_intrument (
+--     id INTEGER PRIMARY KEY AUTOINCREMENT,
+--     name TEXT NOT NULL,
+--     type TEXT NOT NULL,
+--     display_name TEXT NOT NULL,
+    
+--     user_id INTEGER NOT NULL,
+--     update_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+--     is_sysgen INTEGER DEFAULT 0,
+--     FOREIGN KEY (user_id) REFERENCES user (id)
+-- );
+
+CREATE TABLE IF NOT EXISTS oanda_intrument (
+    id INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    instrument_type_id TEXT NOT NULL,
+    display_name TEXT NOT NULL,
+    -- pipLocation INTEGER NOT NULL,
+    -- minimumTradeSize REAL NOT NULL,
+    update_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "oanda_intrument_pk_idx" PRIMARY KEY("id" AUTOINCREMENT),
+	CONSTRAINT "oanda_intrument_u_idx" UNIQUE("name"),
+    FOREIGN KEY ("instrument_type_id") REFERENCES "oanda_intrument_type"("id")
+);
+
+
+
+CREATE TABLE IF NOT EXISTS oanda_intrument_type (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    code TEXT NOT NULL,
+    description TEXT NOT NULL
+);
+INSERT INTO oanda_intrument_type (id, code, description) VALUES (1, 'CURRENCY', 'Currency');
+INSERT INTO oanda_intrument_type (id, code, description) VALUES (2, 'CFD', 'Contract For Difference');
+INSERT INTO oanda_intrument_type (id, code, description) VALUES (3, 'METAL', 'Metal');
+
+
+CREATE TABLE IF NOT EXISTS oanda_intrument_tag (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    instrument_id INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    value TEXT NOT NULL,
+    FOREIGN KEY ("instrument_id") REFERENCES "oanda_intrument"("id")
+);
