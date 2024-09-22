@@ -139,16 +139,21 @@ WHERE i.title LIKE ?""", (wildcard_query,)).fetchone()['count']
 from webapp import serializer
 task_repository = TaskRepository()
 
-@bp.route('/')
-@bp.route('/<int:page_number>')
-def index(page_number=1):
-    #user_repository.seed(16)
-    (records, total_record_count) = task_repository.get_paged_records(page_number)
-    return render_template('issues/index.html', 
-        issues=records, 
-        total_record_count=total_record_count,
-        page_number=page_number)
-    
+# WEB API ROUTES
+
+@bp.route('/api/list')
+def api_list():
+    query = request.args.get('query')
+    page = 1 if request.args.get('page') is None else int(request.args.get('page'))
+    print(f"api search for {query} on page {page}")
+    (records, total_record_count) = task_repository.search(f"%{query}%", page)
+    response = {
+        'total_record_count': total_record_count,
+        'records': [dict(record) for record in records],
+        'page': page
+    }
+    return json.dumps(response, default=serializer)
+
 
 @bp.route('/api/search')
 def api_search():
@@ -164,6 +169,21 @@ def api_search():
     return json.dumps(response, default=serializer)
     #return jsonify([dict(record) for record in records])
     
+
+# WEB PAGE ROUTES
+
+@bp.route('/')
+@bp.route('/<int:page_number>')
+def index(page_number=1):
+    #user_repository.seed(16)
+    (records, total_record_count) = task_repository.get_paged_records(page_number)
+    return render_template('issues/index.html', 
+        issues=records, 
+        total_record_count=total_record_count,
+        page_number=page_number)
+    
+
+
 
 @bp.route('/register', methods=('GET', 'POST'))
 @login_required

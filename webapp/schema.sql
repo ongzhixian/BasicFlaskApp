@@ -312,3 +312,14 @@ CREATE TABLE IF NOT EXISTS oanda_intrument_tag (
     value TEXT NOT NULL,
     FOREIGN KEY ("instrument_id") REFERENCES "oanda_intrument"("id")
 );
+
+
+
+CREATE TABLE IF NOT EXISTS todo_task (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    create_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    update_ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,    
+    description TEXT NULL,
+    is_completed INTEGER NOT NULL DEFAULT 0,
+    priority INT NOT NULL DEFAULT 0
+);
